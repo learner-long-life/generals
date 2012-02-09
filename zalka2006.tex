@@ -1,0 +1,127 @@
+\documentclass{article}
+\usepackage{palatino}
+\usepackage{eprint}
+\usepackage{amsfonts}
+\usepackage{microtype}
+
+\input{Qcircuit}
+
+\title{Summary of Zalka 2006 \cite{Zalka2006a}}
+
+\author{Paul Pham}
+
+\begin{document}
+
+\maketitle
+
+\section{Summary of Contributions}
+
+This paper contributes four main ideas that might be useful in my general
+exam. The first is that not all qubits have to be initialized for an algorithm
+to work correctly. This is a new circuit resource which can be used to
+compare the circuit resources of quantum algorithms and their associated
+architectures. The second is the coset representation technique used to defer
+the need for modular reduction and further parallelize modular exponentiation,
+but I have doubts about its actual application.
+The third is the decomposition of multiplying by an $n$-bit number to
+multiplying by two of its $(n/2)$-bit factors, which saves ancillae but
+at an increase to circuit size. The fourth is the idea of a trinary
+quantum Fourier transform which might save a constant amount of depth, but
+perhaps only for Zalka's special technique for unitialized multiplication.
+
+\section{The Author}
+
+Christof Zalka is one of my heroes because he publishes these papers full of
+great ideas that are so vague, poorly-explained, and without rigorous proofs
+that they often have to be
+vetted and cited through other papers in order to be useful. If only I lived
+in a world where my perfectionism let me do the same. At the same time, that
+means his papers always leave these great open questions for the reader to
+solve and fun calculations for them to do, because in every paragraph he
+makes some unjustified comment or hand-wavy remark and then moves on.
+
+\section{Unitialized Qubits and Approximativeness}
+
+Zalka's definition of uninitialized qubits is that they start in an
+arbitrary state $\ket{\alpha}$ instead of $\ket{0}$. He defines
+\emph{approximative} algorithms as those which succeed for ``most'' inputs,
+say for $1/n$ fraction of them. Since some states may be bad and we may be
+worried about adversarial noise feeding us these bad states as input, we can
+randomly initialize the states into a maximally-mixed state by applying
+random Pauli operators to every qubit. In reality, we may do this by
+using classical random bits to control these Pauli operators, and then discarding
+these classical bits.
+
+I'm not convinced this actually works to create the maximally mixed state
+$\rho = I / d$, or that this is the same as an equal superposition of computational
+basis states, which Zalka states is what he considers a "mixed" state at one
+point. For example, if we start in the cat state, in some sense the
+``maximally entangled'' state, applying random unitaries just creates a
+cat state up to these Pauli corrections. He also assumes if you have two
+registers, say $\ket{\alpha}$ and $\ket{\beta}$, that they are not entangled,
+or at least that you can randomize them so that their entanglement does not
+hurt you.
+
+Furthermore, the extra work we have to do to randomize the inputs may
+negate the benefits of not having to cool down these qubits. I don't know
+the actual experimental physics involved, but it seems that most of the work
+is in cooling down, say, trapped ions, to the lowest two energy states.
+After that, cooling down to the ground state is relatively easy. So it's not
+clear that we are saving that much work.
+
+\section{Coset Representation}
+
+The clever part is that we are converting a single amplitude ``peak''
+$\ket{b}$ into an equal superposition over many peaks
+$\sum_{i} \ket{b+xN}$ which is ``large''
+compared to the first. So that even if this superposition were shifted
+after a non-modular addition, relative to the superposition where
+modular reduction happens, the overlap is still large.
+
+However, many details are missing, so this technique is not satisfying.
+First of all, it appears that we are just keeping around $O(\log n)$ overflow
+bits, albeit in this new representation. We could be doing that in the
+normal representation too. Zalka is intimating that perhaps it is
+easier to do the transform adder in this coset representation, but he
+never actually comes out and says this, or why it is true.
+
+Also, the scheme for converting into and out of coset representation
+are not described, but it appears to be doable in $O(\log^2(n))$ using
+a logarithmic depth adder or comparator like the DKRS scheme in an AC
+architecture. For nearest-neighbor, we should really investigate what is
+the current best adder for small numbers of ancillae on 1D NTC.
+
+\section{Modular multiplication with smaller factors}
+
+Using the reverse Euclidean algorithm, we can factor our random choice of
+$a \in \mathbb{Z}_N$ into $r$ and $r^{-1}$.
+
+\section{Calculations We Could Do}
+
+Zalka mentions from his source Parker and Plenio \cite{Parker2000} that if
+$\ket{a}$ is coprime with the number we are trying to factor $N$, this would
+make our algorithm fail. An interesting calculation would be, given that all
+$\ket{a}$ are likely, $\alpha in \mathbb{Z}_N$, what is the probability of
+getting an $\alpha$ such that $gcd(\alpha, N) = 1$. This would seem to
+involve calculating the proportion of numbers less than $N$ which are
+prime, which we know crudely is upper-bounded by $N - \sqrt{N}$ by
+some theorem of Euler's (? citation needed). Needless to say, this is not a
+great bound. However, as Park notes, we can just run Euclid's algorithm
+reversibly on $\ket{a}$ to determine if it is coprime to $N$ before we
+even start the factoring algorithm.
+
+Another calculation we could do is to rigorously bound the error of the
+coset representation after, say, $m$ additions. What is the notion of error
+that we want here?
+Zalka makes a mysterious
+comment that the error may not accumulate linearly in the worst case, but
+I don't see how it could do otherwise.
+
+\section{Open Questions}
+
+A better quantum algorithm modular inversion (division).
+
+\bibliography{generals}
+\bibliographystyle{tocplain}
+
+\end{document}
