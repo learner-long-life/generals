@@ -1,0 +1,55 @@
+\section{Hamiltonian Simulation}
+
+The original proposal for quantum computing of Feynman in 1982 \cite{Feynman1982}
+took the form of simulation. He pointed out that one problem that
+quantum physical systems would be inherently better at than classical systems
+would be simulating other quantum systems. Today, this is still an interesting
+problem for the field. While Shor's factoring algorithm, and other algorithms
+which are inspired by processing digital information, exhibit great speedups,
+they are also far out of reach of today's experimental capabilities. To
+factor a 4096-bit key in the most conservative implementation, with only
+one layer of error-correction, would still take tens of thousands of qubits.
+In contrast, the problem of simulating a quantum Hamiltonian of 40 particles
+is within the reach of experiments within the next decade and already
+far surpasses the abilities of all but the most powerful classical supercomputers
+today.
+
+Simulation itself is not exactly the same as computation. It
+plays a complementary role to digital computing, much like the
+now-defunct field of analog computing and other analog simulations. Instead
+of digitizing variables and representing them indirectly in binary
+encodings, abstracting away all physical effects, simulations encode variables
+in other analog variables, where the physical state of the analog model
+corresponds in some human-readable way to the simulated state of the
+original variable.
+
+Simulation Hamiltonians also has theoretical interest in that there are some
+quantum physical systems which we can describe in a model
+but can't even simulate quantum mechanical [need citation]. In that case,
+there is an interesting twist in our expectations for a mathematical
+to be \emph{predictive}. Furthermore, due to the "no fast-forwarding" theorem,
+it turns out that even in a quantum simulation, we can't speed up time:
+simulating a many-body quantum system for time $t$ still takes time
+super-linear in $t$, although we can make it arbitrarily close to
+linear \cite{Berry2005}.
+
+Therefore, Hamiltonian simulation remains an interesting problem from the
+time of Feynman until today, both for its practical applications, its
+experimental feasibility, and its theoretical implications.
+
+\subsection{Hamiltonians for Computer Scientists}
+
+But what, you may be thinking to yourself, is a Hamiltonian?
+In a quantum mechanical system, there are quantities which can be observed
+by humans which are represented by Hermitian matrices. A Hermitian matrix
+$H$ is self-adjoint, that is, $H=H^\dagger$, where $H^\dagger$ is the
+conjugate transpose of $H$. Specifically, let $H_{r,c}$ denote the matrix
+entry of $H$ in row $r$ and column $c$. Then the following holds:
+
+\begin{equation}
+H_{r,c} = H^*_{c,r}
+\end{equation}
+
+\subsection{Problem}
+
+To state the problem more formally, suppose 
