@@ -1,0 +1,165 @@
+\section{Quantum Fourier Transform}
+
+As an illustration of this new circuit model, with the resources of
+\emph{circuit space} and \emph{unitialized ancillae} that we established in
+the previous section, we will examine a core building block of many
+quantum algorithms: the quantum Fourier transform (QFT).
+
+[Presumably in the previous section, I discussed the limits of the depth-only
+model, especially if it blows up in the number of ancillae, which is why I
+introduced the idea of circuit space to begin with. Uninitialized qubits is
+more of a curiosity at this point, and our only link to magic state distillation].
+
+The QFT is responsible for most of our examples of an exponential quantum
+speedup over classical algorithms (cite Shor's original paper etc), usually
+by reducing problems to the framework of the hidden subgroup problem
+(cite Chris Lomont's review paper). The most famous example is, of course,
+Shor's algorithm for the prime factorization of large integers, which would
+break the widely-deployed RSA cryptosystem. Therefore, it is a useful
+module to study and optimize, and indeed, much attention has been devoted
+to reducing its depth over the years, making it a great place to first apply
+our model.
+
+\subsection{Analogy to Classical Fourier Transform}
+
+First, we will say a little bit more about the QFT itself. As the name implies,
+it is inspired by the classical Fourier transform, which is used to convert
+information in one representation (say, sound amplitudes over time) into another
+representation (say, signal power over frequency). These representations are
+equivalent, but some tasks are easier to do in one representation than another.
+For example, in analyzing a sound recording in the time domain, many frequencies overlap and it
+may be difficult to detect and remove a source of noise, let's say a low-frequency
+hum associated with electrical mains power frequency. However, in the frequency
+domain, it is easy to pick out a peak at 60 MHz, which is the frequency at
+which North American power companies deliver power at alternating current.
+
+\begin{figure}
+\caption{Sound recording in the time and frequency domains}
+\end{figure}
+
+Does this equation have anything to do with the discrete classical Fourier
+transform? I hope so. Fact check this!
+
+\begin{equation}
+x_j = \sum_{k=0}^{2^n-1} e^{-i2\pi j}y_k
+\end{equation}
+
+By analogy, in many quantum algorithms we can encode useful information
+into the phases associated with the probability amplitudes of different
+computational basis states. Our usual goal is to interfere these phases
+both constructively and destructively, to maximize the probability of measuring
+the computational basis state that corresponds to a correct answer to our
+problem. The restriction is that we can only do this using local operations,
+that, by operating on a few neighboring qubits at a time. Through this means,
+we are effectively operating on many computational basis states in parallel,
+due to the way quantum states combine through the tensor product structure.
+
+[somewhere in the previous section, i unveil my famous spectrum picture
+of quantum states, and demonstrate some examples of highly-entangled
+states and product states]
+
+\subsection{Product Representation and Phase Wheel Picture}
+
+In one domain, we have information encoded in the bits of the computational
+basis states, but these are just encodings, and you can imagine them
+evolving happily in their own separate alternate universes until one of them
+is selected by random chance by a measurement at the end.
+In the second domain, we have the phases of each computational basis state,
+and the way we can get different computational basis states to interact, or
+to create more or less of them, is through two-qubit entangling gates.
+Actually, now we are on thin ice, and I should think carefully about what I
+want to say here, especially as it relates to universality.
+
+Now the quantum analogues of the classical FT equations above.
+
+\begin{equation}
+\ket{x_j} = \sum_{k=0}^{2^n} e^{i\pi k / 2^n}\ket{y_k}
+\end{equation}
+
+What is the relationship between computational basis states and their
+corresponding Fourier transform? I'm glad you asked that! Now I can break out
+my famous rotating phase wheel picture.
+
+\begin{figure}
+\caption{My famous rotating phase wheel picture}
+\end{figure}
+
+The way to convert in between these two domains is the QFT, specifically
+through the famous product representation. In particular, because of the
+symmetry of the Fourier transform state, we can decompose the phase into
+a controlled-rotation on each bit, where $j$ is decomposed into the
+usual binary representation.
+
+\begin{equation}
+j = \sum_{\ell=0}^n 2^\ell j_\ell 
+\end{equation}
+
+\begin{equation}
+\ket{x_j} = \otimes_{k=0}^{n} \frac{\ket{0} + e^{2\pi j_0 \cdots j_k}\ket{1}{\sqrt{2}}
+\end{equation}
+
+In particular, we can rotate the phase on the $\ket{1}$ part of each qubit by
+increasingly more digits of significance of the overall phase shift $j$.
+Somewhere I should also talk about phase significance, and how some qubits
+have a greater influence on the overall phase of their corresponding
+computational basis state. This depends, of course, on there first being
+a $\ket{1}$ part to rotate. Starting from an initial state of $\ket{0}$, we
+need to introduce a Hadamard to get an equal mix. Also, the rotation part is
+achieved by controlled rotation gates $R_k$ of the following form:
+
+\begin{equation}
+R_k = \begin{array}{cc}
+1 & 0 \\
+0 & e^{i\pi / 2^k}
+\end{array}
+\end{equation}
+
+Oh we should also note somewhere that the QFT can be generalized into the
+Walsh-Hadamard transform, or that the Hadamard is just a QFT on 1-qubit.
+Also, these QFT's all work on a modulus which is a power-of-two, $q=2^n$. This
+is not always that useful in factoring, for example, since the modulus $q$ is
+the number we are trying to factor, and if we already know it's a power-of-two,
+well, you can see what I am getting at here.
+
+\subsection{The Basic QFT Circuit in Depth $O(n^2)$}
+
+Now at last, we are ready to see the circuit for the QFT. The most well-known
+and straightforward representation is shown here from Nielsen & Chuang
+\cite{Nielsen2000}, in Figure \ref{fig:qft-circuit}.
+
+\begin{figure}
+\label{fig:qft-circuit}
+\caption{The QFT circuit from Nielsen & Chuang \cite{Nielsen2000}.
+\end{figure}
+
+Note that we are still in the old model of caring about depth, so this is
+in the title of all the remaining subsections. But really, my goal is to show
+you that depth isn't the whole picture, and using this nifty new concept of
+circuit space, you get a much better view of whether you are getting anywhere
+or not. Or my name isn't Peter Shor.
+
+This circuit has both size and depth $O(n^2)$ for a QFT of size. It also
+has the problem that is operates on qubits which may be very far apart, and
+is not very parallel. I assume by this point that I have covered a section
+on parallelism techniques, such as those employed by Hoyer and Spalek, and that
+furthermore I figured out how to do those weird Nordic characters in the names of
+Hoyer and Spalek. However, it doesn't use any ancillae (you know what those
+are right, from the preliminary section on circuit resources).
+
+The circuit space of this circuit is something something. To be calculated!
+
+\subsection{The Nearest-Neighbor QFT Circuit in Depth $O(n)$}
+
+To reduce this to nearest-neighbor architecture and also to operate on
+disjoint sets of qubits at the same time, we use the following
+construction by Fowler, Devitt, and Hollenberg \cite{Fowler2006}.
+
+\subsection{The Semi-Classical QFT Circuit in Width}
+
+This is the Beauregard circuit, but it is really for phase estimation.
+I need to think some more before I go around indiscriminately trying to compare
+it directly to other QFT circuits.
+
+
+In its original form, and the one most well-known to beginning students of
+quantum computing.
