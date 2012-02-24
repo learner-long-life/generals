@@ -1,0 +1,95 @@
+\section{Quantum Circuit Resources}
+
+Here we can mostly copy from my other papers, where I define quantum
+architecture as being the connecting layer between quantum algorithms
+and physical experiment. It's a really necessary connection, since otherwise
+nice algorithms are ignored or unknown by experimentalists for lack of a
+realistic mapping or being the resources are still too huge. Therefore, the
+gains to be made in quantum architecture are usually not of the exponential
+variety, but are polynomially gains asymptotically, which may turn out to be
+huge in practice with actual constants. This may make the difference between
+implementing a quantum computer in a few years versus several decades, if you
+think we can sustain dramatic tension with DARPA / NSA / IARPA that long.
+
+\subsection{The View}
+
+I also mention here the field of quantum computer engineering, which will
+include as its subfields quantum compilers (gate construction) and quantum
+architecture (layout and error correction). I am mostly concerned
+
+The tone of most of my paper is therefore more practically minded. Sometimes
+mathematical formalism is necessary to realize substantial savings, but I will
+not be overly concerned with nicely erasing my ancillae for the next algorithm
+in line, especially if it means a large number of operations to uncompute it
+to save a relatively small number of ancillae.
+
+Also, I will stick to asymptotic improvements where possible, since these
+statements are less likely to change over time or be dependent on
+as-yet-unknown physical implementation. However, as an engineer I am still
+impressed by numerical improvements, and on occasion I will use actual
+constants to call out changes which would otherwise be lost in $O(\cdot)$
+notation. This may be more appropriate in an intro section, which also
+includes the rules of quantum computing.
+
+\subsection{Circuit Resources}
+
+In the traditional quantum circuit model, qubits are represented by lines,
+and operations over the flow of time going from left to right. Of course,
+due to the way matrix multiplication works, in real-life implementations,
+the gates are applied going from right to left. Gates are represented by
+blocks, and can be single-qubit (occurring on a single line) or
+multi-qubit (spanning multiple lines).
+
+\begin{figure}
+\label{fig:circuit-resource.tex}
+\caption{The circuit resources of width, depth, and size as described by others.}
+\end{figure}
+
+\emph{Circuit size} is the number of non-identity gates applied over time.
+We specify non-trivial here, since in reality the identity gate may involve
+extensive error-correction just to maintain a coherent quantum state over
+a timestep, even without enacting any logical operation on it.
+\emph{Circuit width} is the total number of qubits used in a computation,
+including those storing the input and the output. It is fashionable in other
+papers to only count ancillary qubits (ancillae), that is, the temporary 
+scratch space used by the computation, which start out in the $\ket{0}$ state
+and must be returned to it. This makes the circuit width smaller, and a more
+impressive figure. However, this makes it hard to compare circuits
+which compute the output in-place, ``on-top'' of the input qubits to save
+space, to speak, versus those who compute out-of-place. Furthermore,
+the output of one circuit is often the input to another, and in a practical sense,
+we are interested in how many qubits we must physically maintain over time in
+our experiment, and not whether these qubits store the inputs or outputs per se.
+\emph{Circuit depth} is in some ways the most important figure. It describes
+the number of parallel timesteps needed to complete a computation, given enough
+parallel classical controllers. It provides a lower bound on the running time,
+and like classical circuit depth, is analogous to the delay we can expect
+from entering out inputs to getting a result.
+
+Quantum architecture is primarily concerned with reducing circuit resources,
+and previous approaches have concentrated on reducing circuit depth, circuit
+width, or some combination of both (cite here the LNN factoring papers,
+Van Meter's stuff).
+
+\subsection{Architectural Models}
+
+We follow here the terminology of Van Meter \cite{VanMeter2006} in his
+definition of architectural models with different constraints, going from
+very abstract but simple to more realistic but with more complicated constraints.
+
+The qubits in the circuit models above are not
+necessarily related spatially, and arbitrary interactions are allowed.
+This is called the Abstract Concurrent (\textsc{AC}) model.
+
+If we stipulate that the qubits then must be spatially related, in that
+neighboring qubits in the circuit diagram are actually neighboring in real-life,
+we take the natural shape of the entire arrangement of qubits to be in a line.
+For the sake of realism, we only allow neighboring-qubits to interact, and we
+only allow single-qubit and two-qubit gates. Due to various universality
+proofs and fault-tolerance, it suffices to restrict ourselves to single-qubit
+operations which are from the Clifford group and the $\pi/8$ gate and CNOT.
+(Cite here Nielsen & Chuang, or KSV). We allow concurrent operations
+acting on disjoint sets of qubits to occur within the same timestep.
+This is called \textsc{1D-NTC}.
+
+Next, it becomes natural to extend this model into two dimensions,
