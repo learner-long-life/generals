@@ -1,4 +1,5 @@
 \section{Quantum Fourier Transform}
+\label{sec:qft}
 
 As an illustration of this new circuit model, with the resources of
 \emph{circuit space} and \emph{unitialized ancillae} that we established in
@@ -95,7 +96,8 @@ j = \sum_{\ell=0}^n 2^\ell j_\ell
 \end{equation}
 
 \begin{equation}
-\ket{x_j} = \otimes_{k=0}^{n} \frac{\ket{0} + e^{2\pi j_0 \cdots j_k}\ket{1}{\sqrt{2}}
+\ket{x_j} = \otimes_{k=0}^{n}
+\frac{\ket{0} + e^{2\pi j_0 \cdots j_k}\ket{1}}{\sqrt{2}}
 \end{equation}
 
 In particular, we can rotate the phase on the $\ket{1}$ part of each qubit by
@@ -121,15 +123,27 @@ is not always that useful in factoring, for example, since the modulus $q$ is
 the number we are trying to factor, and if we already know it's a power-of-two,
 well, you can see what I am getting at here.
 
+In the following sections, I will describe QFT circuit implementations of
+decreasing depth, but also apply our new model of circuit space to see what
+kind of trade-off we are making. If you are a theorist, then you will be
+excited by the progression of depths of quadratic $O(n^2)$, to log-linear
+$O(n\log n)$, to linear $O(n)$, to logarithmic $O(\log n)$, to constant
+depth $O(1)$.
+
+We basically ignore the technique of uninitialized qubits, although that
+should be an open problem to work on. But we do get to use our combined
+circuit space / success probability product. We need a better name for it.
+Especially with the approximate circuits.
+
 \subsection{The Basic QFT Circuit in Depth $O(n^2)$}
 
 Now at last, we are ready to see the circuit for the QFT. The most well-known
-and straightforward representation is shown here from Nielsen & Chuang
+and straightforward representation is shown here from Nielsen \& Chuang
 \cite{Nielsen2000}, in Figure \ref{fig:qft-circuit}.
 
 \begin{figure}
 \label{fig:qft-circuit}
-\caption{The QFT circuit from Nielsen & Chuang \cite{Nielsen2000}.
+\caption{The QFT circuit from Nielsen \& Chuang \cite{Nielsen2000}}.
 \end{figure}
 
 Note that we are still in the old model of caring about depth, so this is
@@ -137,6 +151,11 @@ in the title of all the remaining subsections. But really, my goal is to show
 you that depth isn't the whole picture, and using this nifty new concept of
 circuit space, you get a much better view of whether you are getting anywhere
 or not. Or my name isn't Peter Shor.
+
+Here is the calculation of depth. For qubit $k$, we require $k$ controlled
+rotations of $R_2$ up to $R_k$, controlled on qubit $k$ and targeting all
+the other qubits. Therefore, the sum of all these numbers is $n(n-1)/2$, 
+or $O(n^2)$, as we learned from Gauss's famous childhood story.
 
 This circuit has both size and depth $O(n^2)$ for a QFT of size. It also
 has the problem that is operates on qubits which may be very far apart, and
@@ -148,11 +167,98 @@ are right, from the preliminary section on circuit resources).
 
 The circuit space of this circuit is something something. To be calculated!
 
+\subsection{The Approximate QFT Circuit in Depth $O(n\log n)$}
+
+Now we leave the world of exact QFTs and see if we can't save some
+resources by only approximately computing the QFT. After all, as rotations
+get finer and finer, for larger and larger $k$, $R_k$ becomes closer and closer
+to the identity, which is to say, doing nothing at all. Intuitively, we can
+just cut off rotations after some maximum $k_0$ and still get pretty much
+the same QFT. Now this is definitely firmly within the territory of old
+homework problems from Aram's class. But we should cite the original paper
+by Coppersmith or something.
+
+\begin{figure}
+\label{fig:qft-approx}
+\caption{Circuit for the approximate QFT}
+\end{figure}
+
+Let's say we would like a constant error of $\epsilon$, when would we have
+to cut off each series of controlled rotations to achieve this?
+
+Here is the calculated error if we cut off at $\log_n$ for each series.
+
+\begin{equation}
+???
+\end{equation}
+
+Now, we have $n$ qubits and $n$ series of controlled rotations, but now each
+series only has at most $O(\log n)$ controlled rotations in it.
+This gives us depth and size $O(n \log n)$. However, there still seems to
+be money left on the table, ways to parallelize even further.
+
 \subsection{The Nearest-Neighbor QFT Circuit in Depth $O(n)$}
 
 To reduce this to nearest-neighbor architecture and also to operate on
 disjoint sets of qubits at the same time, we use the following
 construction by Fowler, Devitt, and Hollenberg \cite{Fowler2006}.
+
+\begin{figure}
+\label{fig:qft-fdh}
+\caption{The nearest-neighbor QFT circuit in 1D NTC \cite{Fowler2006}.}
+\end{figure}
+
+This, as you know, reduces the depth now to linear $O(n)$. The size and
+the space remain the same. So there you have it, it's more physical
+realistic, and it's more efficient. Voila!
+
+Also, it makes a pleasing triangular shape. This is what is used in the
+nested-adds controlled modular multiplier of Kutin later on in Section
+something or other.
+
+Oh, but this was just a tangent into physically realistic architectures.
+There is a QFT in linear depth according to folklore, according to Hoyer
+and Spalek, so we should try to figure that one out too. Maybe it's the same
+one.
+
+\subsection{The Parallelized QFT in Depth $O(\log n)$}
+
+Now we are moving into grown-up techniques which are non-trivial, the
+parallel QFT of Cleve \& Watrous which achieve logarithmic depth. Although in
+my opinion, erasing the ancillae is overrated. Oh this should set the general
+tone of the report. In the beginning I have an engineer's perspective, and
+have my sights set on quantum computer engineering. So I don't really care
+about things like erasing the ancillae nicely or neglecting the classical
+controller just to make a fair comparison and be able to compare circuit
+complexity classes directly. So I actually think Cleve \& Watrous going through
+all this work to erase their ancillae is silly, especially since you can just
+keep it around as garbage. Or even measure it presumably, and then you
+automatically have a product state. Am I missing something here? FACT CHECK.
+Or simulate in QCL.
+
+\begin{figure}
+\label{fig:qft-cw}
+\caption{The parallel QFT of Cleve and Watrous}
+\end{figure}
+
+The above is a picture using the parallel timestep and log-depth fanout of
+the qubits. We can mention here the connection to unbounded fanout techniques which
+would make this constant depth.
+
+This technique trades space for time, and is basically analogous to the
+approach of Super-Kitaev. We should actually describe the Super-Kitaev
+approach since we are more familiar with it. By creating multiple QFT states,
+hmm, let's see if I actually know how to explain this.
+
+\subsection{The Approximate QFT in Depth $O(1)$}
+
+Well, this is in the Hoyer-Spalek paper. Getting down to exact QFT in 
+constant-depth is in BKP, which I can reference here, but I will leave this as
+a later thing to read more on if I have time.
+
+Actually, I have no idea how this works at all, even in the approximate case.
+But by reading the Hoyer/Spalek paper, I can get a better sense of the
+differences between $2^n$ and arbitrary moduli.
 
 \subsection{The Semi-Classical QFT Circuit in Width}
 
@@ -160,6 +266,7 @@ This is the Beauregard circuit, but it is really for phase estimation.
 I need to think some more before I go around indiscriminately trying to compare
 it directly to other QFT circuits.
 
+\subsection{Open Problems}
 
-In its original form, and the one most well-known to beginning students of
-quantum computing.
+Optimizing the QFT circuit even more in terms of improving its space-success
+product. 

@@ -1,4 +1,5 @@
 \section{Magic State Distillation}
+\label{sec:magic}
 
 Now we come to a beautiful idea which combines a geometric picture of
 quantum computing with error correction, circuit construction, the idea of
@@ -169,11 +170,11 @@ The below needs to be fact-checked.
 \rho = p\ket{H^+}\bra{H^+} + (1-p)\ket{H^-}\bra{H^-}
 \end{equation}
 
-That is, we can describe \emph} mixed state $\rho$ as a noisy preparation
+That is, we can describe mixed state $\rho$ as a noisy preparation
 of the eigenstate $\ket{H^+}$ with some error probability $p$, and we already
 know how to correct errors to an arbitrarily low-precision: using
 concatenated error correction! In this case, we consider our $n$ copies of
-$\rho$ to have been ideally prepared as $\ket{H^}}$, but that noise has
+$\rho$ to have been ideally prepared as $\ket{H^+}$, but that noise has
 perturbed it. I don't know if this picture is exactly correct, since Aram
 seemed surprised by this, so I will need to think about this some more.
 So we then apply concatenated levels of error decoding to
@@ -204,7 +205,7 @@ Fact check!) However, that leaves the region outside the octahedron and within
 the surface of the sphere unaccounted for, and this can be a fairly big space...
 something something.
 
-We know that there is a tight separation in the $\het{H}$ direction right up
+We know that there is a tight separation in the $\ket{H}$ direction right up
 to the edge of $\mathcal{O}$. That is, points in the plane that intersect
 the edges of $\mathcal{O}$ and the origin, that is, bisecting both the
 octahedron and the Bloch ball, but outside of $\mathcal{O}$ itself, can always

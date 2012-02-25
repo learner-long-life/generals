@@ -1,4 +1,5 @@
 \section{Hamiltonian Simulation}
+\label{sec:hamsim}
 
 The original proposal for quantum computing of Feynman in 1982 \cite{Feynman1982}
 took the form of simulation. He pointed out that one problem that
@@ -50,6 +51,51 @@ entry of $H$ in row $r$ and column $c$. Then the following holds:
 H_{r,c} = H^*_{c,r}
 \end{equation}
 
+However, Hermitian matrices are not in general unitary, and we know that
+quantum systems evolve according to unitary operations. It turns out that
+we can say a quantum state evolves according to a certain Hamiltonian $H$ for
+a time $t$, meaning that it behaves in a certain way when placed in a system
+where the energy is described by $H$. This behavior is described by a unitary
+$U$
+which is the Hamiltonian raised to an exponent. The exact reason for this,
+and the appearance of the term $-i$, where $i = \sqrt{-1}$, has to do with
+solutions to the Schrodinger equation and deeper underlying formalisms of
+quantum mechanics, which we will not go into here.
+
+\begin{displaymath}
+U_H = e^{-iHt}
+\end{displaymath}
+
+What does it mean to exponentiate a matrix with the base $e$? In analogy to 
+the Taylor expansion of the function $e^x$, which exponentiates a number,
+we can define the Taylor expansion of the matrix $e^{-iHt}$ which is itself
+a $2^n\times 2^n$ matrix.
+
+\begin{displaymath}
+e^{-iHt} = \sum_{j=0}^{\infty} \frac{(-iHt)^t}{j!}
+\end{displaymath}
+
+Since this is an infinite sum which converges to the true matrix
+$e^{-iHt}$, we can take only the initial $k$ terms to get an approximation
+which is accurate, neglecting lower-order $O(t^k)$ terms.
+
 \subsection{Problem}
 
-To state the problem more formally, suppose 
+To state the problem more formally, suppose that you have an initial
+quantum state $\ket{\psi_0}$ of $n$ qubits
+and you would like to evolve it according to a Hamiltonian $H$ for time
+$t$ to get
+a final state $\ket{\psi_f}$. This final state will have the same properties
+as the state of the system that you were originally trying to simulate. To
+enact this simulation, we perform a unitary which is equivalent to the
+exponential $e^{-iHT}$.
+
+\begin{displaymath}
+\ket{\psi_f} = e^{-iHT} \ket{\psi_0}
+\end{displaymath}
+
+However, $H$ (and therefore $U_H$)
+is an exponentially large matrix in the number of qubits you
+are trying to simulate. If you were to generically compile $U_H$, 
+
+In \cite{Berry2005} we 
