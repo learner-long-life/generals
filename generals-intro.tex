@@ -73,7 +73,6 @@ forgot how to do that.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Rule 1: Qubits}
 
-\begin{definition}
 Rule 1 [Qubits]: Our basic unit of information is a quantum bit (\emph{qubit}),
 a two-level system which can be represented by a column vector with
 complex coefficients whose magnitudes squared sum to 1. These are known
@@ -83,7 +82,6 @@ is written using Dirac bra-ket notation due to a visual pun for the
 inner product, or the overlap between two quantum states.
 The states $\ket{0}$ and $\ket{1}$ are known as the computational basis,
 and correspond to our normal idea of classical bits.
-\end{definition}
 
 \begin{equation}
 \ket{\psi} = \alpha \ket{0} + \beta \ket{1} \qquad
@@ -117,13 +115,11 @@ one.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Rule 3: Unitary Operations}
 
-\begin{definition}
 Rule 3 [Unitary Operations]:
 Qubits can be transformed by operations (also called \emph{gates})
 that take the form of $2\times 2$ unitary matrices of unit determinant.
 That is, they are reversible ($UU^\dagger = I$) and preserve the magnitude
 of quantum states.
-\end{definition}
 
 \begin{equation}
 \left[ \begin{array}{cc}
@@ -135,11 +131,8 @@ c & d \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Rule 4: Measurement}
 
-\begin{definition}
 Rule 3 [Measurement]: While a qubit can exist in a superposition
 of computational basis states, when measured (that is, interacted with a
 large macroscopic object like a human-sized scientific instrument), it
 collapses to either $\ket{0}$ with probability $|\alpha|^2$ or
 $\ket{1}$ with probability $|\beta|^2$.
-\end{definition}
-

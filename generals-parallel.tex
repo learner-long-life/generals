@@ -1,17 +1,101 @@
 \section{Parallelization Techniques}
 \label{sec:parallel}
 
-Here we survey some powerful techniques behind a recent trend of work on
-constant-depth circuits. In \cite{Moore1999} it was known that the unbounded
-fanout gate and the parity gate were equivalent, in the sense that conjugating
-one by Hadamards on every qubit gave you the other circuit, as shown in
-Figure \ref{fig:parity-fanout}
+Here we survey two powerful techniques behind a recent trend of work on
+constant-depth circuits. The first is the constant-depth unbounded fan-out.
+The second is the parallelization of
+commuting gates and the so-called OR reduction of H{\o}yer and {\v S}palek
+\cite{Hoyer2002}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unbounded Fanout}
+
+In classical
+circuits, the ability to copy bits is taken for granted. However,
+in quantum circuits,
+it is impossible to create an unentangled copy of a general quantum state, a
+principle known as ``no-cloning'' \cite{Nielsen2000}. However,
+it \emph{is} possible to create entangled copies by transversally applying
+the CNOT gate to corresponding qubits in the source and destination register.
+One can copy one source qubit $\ket{\psi} = \alpha \ket{0} + \beta \ket{1}$
+to $n$ target qubits in this manner according to Equation \ref{eqn:copy}.
+
+\begin{equation}
+(\alpha \ket{0} + \beta \ket{1}) \otimes \ket{0}^{\otimes n} \rightarrow
+\alpha \ket{0}^{\otimes (n+1)} + \beta \ket{1}^{\otimes (n+1)}
+\end{equation}
+
+This can be done in logarithic depth with a cascade of CNOTs as shown
+in Figure \ref{fig:cnot-cascade}.
 
 \begin{figure}
-\label{fig:parity-fanout}
-\caption{The equivalence of the fanout and parity gate \cite{Moore1999}.
+\label{fig:cnot-cascade}
+\caption{A cascade of CNOTs implementing unbounded fan-out in logarithmic depth}
 \end{figure}
 
-\subsection{Commuting Operations}
+Moore and Nilsson showed it was equivalent in power to the parity gate
+\cite{Moore1998}. H{\o}yer and {\v S}palek have studied it in the
+context of constant-depth circuits over a fixed basis ($\textsc{QNC}_f^0$)
+to approximate AND, OR, MAJORITY, THRESHOLD$[t]$, and EXACT$[t]$ gates.
 
+This has also been used in adder circuits by Takahashi and Tani
+\cite{Takahashi2009} to achieve $O(\log^* n)$ depth.
+These gates are not just of theoretical interest; some physical systems
+such as ion traps admit the implementation of efficient multi-qubit gates,
+following the work of M{\o}lmer and S{\o}rensen \cite{Sorensen1999}.
+Recently unbounded fanout gates have also been implemented in 2D architectures using
+constant-depth cat-state creation in $n$ ancillary qubits to
+implement $n$-qubit controlled operations \cite{Rosenbaum2012} and
+factoring in polylogarithmic-depth on a \textsc{2D NTC} architecture
+\cite{Pham2012b}.
+An $n$-qubit cat state is shown in Equation \ref{eqn:cat}; it is the
+maximally entangled $n$-qubit state which is an equal superposition of all
+$\ket{0}$'s and all $\ket{1}$'s.
+However, unbounded fanout consumes the cat state,
+in that it is not possible to uncompute the cat state after its use.
+
+\begin{equation}
+\label{eqn:cat}
+\ket{\Phi_n} = \frac{1}{\sqrt{2}} \(\ket{0}^{\otimes n} + \ket{1}^{\otimes n}\)
+\end{equation}
+
+We describe how unbounded fanout can be used later to parallelize the
+quantum Fourier transform in Section \ref{sec:qft}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{OR Reduction of Hoyer and Spalek}
+
+Gate applied to different qubits can be applied at the same time. This is
+the classical definition of parallelism
+
+A key insight of Ref. \cite{Hoyer2002} is that any two commuting operations
+can be performed as the same time, provided that (1) we have access to
+unbounded fan-out and (2) that can efficiently transform
+into the basis where they are both diagonal and that we have access.
+This second condition is the case for many
+functions needed in quantum algorithms, for example modular arithmetic
+\cite{Moore1998}. This technique is exploited in their construction of
+circuits for constant-depth rotation by Hamming weight and rotation by
+Hamming value.
+
+The essential concept between the OR reduction is to reduce computing the
+OR of $n$ qubits to computing the OR of $\log n$ qubits in constant depth.
+Once this has been done, one can apply the reduction recursively to reduce
+the OR of $\log n$ qubits to the OR of $\log \log n$ qubits, until we
+are left with a constant number of qubits that we can take the OR of
+in the obvious way. In this manner, H{\o}yer and {\v S}palek get a circuit
+of $O\log^* n}$ depth, where $\log^*n$ is the iterated logarithm function.
+
+This technique was later extended by Takahashi and Tani to create an exact circuit
+for OR in constant-depth. This resolves the open question of the power of
+various constant-depth circuit complexity classes, namely.
+
+\begin{equation}
+\label{eqn:qcc}
+\textsc{QNC}_f^0 = \textsc{QAC}_f^0 = \textsc{QTC}_f^0
+\end{equation}
+
+Equation \ref{eqn:qcc} is surprising because there is a separation between
+the classical equivalents. Namely, 
+
+\Ipe{pict/rotation-hamming.ipe}

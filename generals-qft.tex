@@ -1,272 +1,302 @@
 \section{Quantum Fourier Transform}
 \label{sec:qft}
 
-As an illustration of this new circuit model, with the resources of
-\emph{circuit space} and \emph{unitialized ancillae} that we established in
-the previous section, we will examine a core building block of many
-quantum algorithms: the quantum Fourier transform (QFT).
-
-[Presumably in the previous section, I discussed the limits of the depth-only
-model, especially if it blows up in the number of ancillae, which is why I
-introduced the idea of circuit space to begin with. Uninitialized qubits is
-more of a curiosity at this point, and our only link to magic state distillation].
+We now apply the circuit resource model to a core building block of
+many quantum algorithms: the quantum Fourier transform (QFT).
 
 The QFT is responsible for most of our examples of an exponential quantum
-speedup over classical algorithms (cite Shor's original paper etc), usually
-by reducing problems to the framework of the hidden subgroup problem
-(cite Chris Lomont's review paper). The most famous example is, of course,
-Shor's algorithm for the prime factorization of large integers, which would
-break the widely-deployed RSA cryptosystem. Therefore, it is a useful
-module to study and optimize, and indeed, much attention has been devoted
-to reducing its depth over the years, making it a great place to first apply
-our model.
-
-\subsection{Analogy to Classical Fourier Transform}
-
-First, we will say a little bit more about the QFT itself. As the name implies,
-it is inspired by the classical Fourier transform, which is used to convert
-information in one representation (say, sound amplitudes over time) into another
-representation (say, signal power over frequency). These representations are
-equivalent, but some tasks are easier to do in one representation than another.
-For example, in analyzing a sound recording in the time domain, many frequencies overlap and it
-may be difficult to detect and remove a source of noise, let's say a low-frequency
-hum associated with electrical mains power frequency. However, in the frequency
-domain, it is easy to pick out a peak at 60 MHz, which is the frequency at
-which North American power companies deliver power at alternating current.
-
-\begin{figure}
-\caption{Sound recording in the time and frequency domains}
-\end{figure}
-
-Does this equation have anything to do with the discrete classical Fourier
-transform? I hope so. Fact check this!
+speedup over classical algorithms. It was introduced in Shor's
+original paper on finding prime factors and the discrete logarithm
+\cite{Shor1995}, and it can be used to solve
+other instances of the more general Hidden Subgroup Problem (HSP)
+\cite{Lomont2004} over other finite Abelian groups \cite{Nielsen2000}.
+It is now known
+how to factor without the QFT,
+using just phase estimation \cite{Kitaev2002} \cite{Cleve2000}, which may
+be desirable due to the fine $\Lambda(R_k)$ controlled-phase rotations involved.
+These are difficult to compile into an efficient, fault-tolerant, universal
+gateset as described later in Section \ref{sec:ft}.
 
 \begin{equation}
-x_j = \sum_{k=0}^{2^n-1} e^{-i2\pi j}y_k
-\end{equation}
-
-By analogy, in many quantum algorithms we can encode useful information
-into the phases associated with the probability amplitudes of different
-computational basis states. Our usual goal is to interfere these phases
-both constructively and destructively, to maximize the probability of measuring
-the computational basis state that corresponds to a correct answer to our
-problem. The restriction is that we can only do this using local operations,
-that, by operating on a few neighboring qubits at a time. Through this means,
-we are effectively operating on many computational basis states in parallel,
-due to the way quantum states combine through the tensor product structure.
-
-[somewhere in the previous section, i unveil my famous spectrum picture
-of quantum states, and demonstrate some examples of highly-entangled
-states and product states]
-
-\subsection{Product Representation and Phase Wheel Picture}
-
-In one domain, we have information encoded in the bits of the computational
-basis states, but these are just encodings, and you can imagine them
-evolving happily in their own separate alternate universes until one of them
-is selected by random chance by a measurement at the end.
-In the second domain, we have the phases of each computational basis state,
-and the way we can get different computational basis states to interact, or
-to create more or less of them, is through two-qubit entangling gates.
-Actually, now we are on thin ice, and I should think carefully about what I
-want to say here, especially as it relates to universality.
-
-Now the quantum analogues of the classical FT equations above.
-
-\begin{equation}
-\ket{x_j} = \sum_{k=0}^{2^n} e^{i\pi k / 2^n}\ket{y_k}
-\end{equation}
-
-What is the relationship between computational basis states and their
-corresponding Fourier transform? I'm glad you asked that! Now I can break out
-my famous rotating phase wheel picture.
-
-\begin{figure}
-\caption{My famous rotating phase wheel picture}
-\end{figure}
-
-The way to convert in between these two domains is the QFT, specifically
-through the famous product representation. In particular, because of the
-symmetry of the Fourier transform state, we can decompose the phase into
-a controlled-rotation on each bit, where $j$ is decomposed into the
-usual binary representation.
-
-\begin{equation}
-j = \sum_{\ell=0}^n 2^\ell j_\ell 
-\end{equation}
-
-\begin{equation}
-\ket{x_j} = \otimes_{k=0}^{n}
-\frac{\ket{0} + e^{2\pi j_0 \cdots j_k}\ket{1}}{\sqrt{2}}
-\end{equation}
-
-In particular, we can rotate the phase on the $\ket{1}$ part of each qubit by
-increasingly more digits of significance of the overall phase shift $j$.
-Somewhere I should also talk about phase significance, and how some qubits
-have a greater influence on the overall phase of their corresponding
-computational basis state. This depends, of course, on there first being
-a $\ket{1}$ part to rotate. Starting from an initial state of $\ket{0}$, we
-need to introduce a Hadamard to get an equal mix. Also, the rotation part is
-achieved by controlled rotation gates $R_k$ of the following form:
-
-\begin{equation}
-R_k = \begin{array}{cc}
-1 & 0 \\
-0 & e^{i\pi / 2^k}
+\label{eqn:rk}
+\Lambda(R_k) = \left[ \begin{array}{cccc}
+1 & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & e^{i\pi / 2^k}
 \end{array}
+\right]
 \end{equation}
 
-Oh we should also note somewhere that the QFT can be generalized into the
-Walsh-Hadamard transform, or that the Hadamard is just a QFT on 1-qubit.
-Also, these QFT's all work on a modulus which is a power-of-two, $q=2^n$. This
-is not always that useful in factoring, for example, since the modulus $q$ is
-the number we are trying to factor, and if we already know it's a power-of-two,
-well, you can see what I am getting at here.
+However, the QFT is still of practical importance
+in determining the
+properties of quantum chemical systems
+(such as their ground state energies) \cite{Wang2008} as well as in
+many algorithms of the late 90s such as
+the transform adder by Draper \cite{Draper2000} and extensions to Grover's
+search algorithm \cite{Grover1996} \cite{Brassard1998} \cite{Mosca1999}.
+While this gives the QFT somewhat of a vintage feel within the community,
+it is still a venerable, useful technique.
+Therefore, it makes an ideal candidate for analyzing its optimization
+over the years as we will do in the rest of this section.
 
-In the following sections, I will describe QFT circuit implementations of
-decreasing depth, but also apply our new model of circuit space to see what
-kind of trade-off we are making. If you are a theorist, then you will be
-excited by the progression of depths of quadratic $O(n^2)$, to log-linear
-$O(n\log n)$, to linear $O(n)$, to logarithmic $O(\log n)$, to constant
-depth $O(1)$.
+We will show how the QFT has been parallelized and its depth decreased from the
+initial quadratic
+value \ref{subsec:qft-quad} down to
+log-linear \ref{subsec:qft-loglin},
+linear \ref{subsec:qft-linear}, and logarithmic depth\ref{subsec:qft-log},
+as well as its circuit space in each case and error probability, where
+appropriate.
 
-We basically ignore the technique of uninitialized qubits, although that
-should be an open problem to work on. But we do get to use our combined
-circuit space / success probability product. We need a better name for it.
-Especially with the approximate circuits.
+\subsection{The Discrete Fourier Transform}
 
-\subsection{The Basic QFT Circuit in Depth $O(n^2)$}
-
-Now at last, we are ready to see the circuit for the QFT. The most well-known
-and straightforward representation is shown here from Nielsen \& Chuang
-\cite{Nielsen2000}, in Figure \ref{fig:qft-circuit}.
-
-\begin{figure}
-\label{fig:qft-circuit}
-\caption{The QFT circuit from Nielsen \& Chuang \cite{Nielsen2000}}.
-\end{figure}
-
-Note that we are still in the old model of caring about depth, so this is
-in the title of all the remaining subsections. But really, my goal is to show
-you that depth isn't the whole picture, and using this nifty new concept of
-circuit space, you get a much better view of whether you are getting anywhere
-or not. Or my name isn't Peter Shor.
-
-Here is the calculation of depth. For qubit $k$, we require $k$ controlled
-rotations of $R_2$ up to $R_k$, controlled on qubit $k$ and targeting all
-the other qubits. Therefore, the sum of all these numbers is $n(n-1)/2$, 
-or $O(n^2)$, as we learned from Gauss's famous childhood story.
-
-This circuit has both size and depth $O(n^2)$ for a QFT of size. It also
-has the problem that is operates on qubits which may be very far apart, and
-is not very parallel. I assume by this point that I have covered a section
-on parallelism techniques, such as those employed by Hoyer and Spalek, and that
-furthermore I figured out how to do those weird Nordic characters in the names of
-Hoyer and Spalek. However, it doesn't use any ancillae (you know what those
-are right, from the preliminary section on circuit resources).
-
-The circuit space of this circuit is something something. To be calculated!
-
-\subsection{The Approximate QFT Circuit in Depth $O(n\log n)$}
-
-Now we leave the world of exact QFTs and see if we can't save some
-resources by only approximately computing the QFT. After all, as rotations
-get finer and finer, for larger and larger $k$, $R_k$ becomes closer and closer
-to the identity, which is to say, doing nothing at all. Intuitively, we can
-just cut off rotations after some maximum $k_0$ and still get pretty much
-the same QFT. Now this is definitely firmly within the territory of old
-homework problems from Aram's class. But we should cite the original paper
-by Coppersmith or something.
-
-\begin{figure}
-\label{fig:qft-approx}
-\caption{Circuit for the approximate QFT}
-\end{figure}
-
-Let's say we would like a constant error of $\epsilon$, when would we have
-to cut off each series of controlled rotations to achieve this?
-
-Here is the calculated error if we cut off at $\log_n$ for each series.
+As the name implies, the QFT is inspired by the classical, discrete
+Fourier transform (DFT) which relates two sets of complex numbers
+$\{x_0, x_1, \ldots, x_{N-1}\}$ and $\{y_0, y_1, \ldots, y_{N-1}\}$,
+each in different domains.
 
 \begin{equation}
-???
+y_k \equiv \frac{1}{\sqrt{N}} \sum_{j=0}^{N-1} x_j e^{2\pi i j k / N}
 \end{equation}
 
-Now, we have $n$ qubits and $n$ series of controlled rotations, but now each
-series only has at most $O(\log n)$ controlled rotations in it.
-This gives us depth and size $O(n \log n)$. However, there still seems to
-be money left on the table, ways to parallelize even further.
+This is the idea behind the fast Fourier transform (FFT) \cite{Cooley1965}
+used in fast
+integer multiplication, fast matrix multiplication \cite{Schoenhage1971},
+and many other
+important applications \cite{Maslen1997}. The QFT performs a different
+operation on quantum states, namely it converts between two bases of
+quantum states,
+say $\{\ket{j}\}$ and $\{\ket{k}\}$, where usually one of these bases is
+the computational basis $\{\ket{0}, \ket{1}, \ldots, \ket{N-1}\}$
+and the other we call the \emph{Fourier basis}. The complex amplitudes
+$x_j$ of a
+particular $\ket{j}$ are related to the amplitudes $y_k$ of all the $\ket{k}$
+by the discrete Fourier transform.
 
-\subsection{The Nearest-Neighbor QFT Circuit in Depth $O(n)$}
+\begin{equation}
+\ket{j} = \frac{1}{\sqrt{N}} \sum_{k=0}^{N-1} e^{2\pi i j k / N} \ket{k}
+\end{equation}
 
-To reduce this to nearest-neighbor architecture and also to operate on
-disjoint sets of qubits at the same time, we use the following
-construction by Fowler, Devitt, and Hollenberg \cite{Fowler2006}.
+\begin{equation}
+\sum_{j=0}^{N-1} x_j \ket{j} \rightarrow \sum_{k=0}^{N-1} y_k \ket{k}
+\end{equation}
 
+The relationship between the QFT and the DFT can be thought of as the
+difference between computing all the probabilities of a certain distribution
+and just sampling from a distribution \cite{Cleve2000}. The latter problem is
+often much easier. In both cases, we speak of computing the Fourier transform
+with respect to the modulus $N$, the number of basis elements.
+
+The application of the QFT in most quantum algorithms
+involve encoding some useful information about each state into its phase,
+so that after applying the QFT or its inverse, the correct answer is measured
+with high probability.
+
+%%%%%%%%%%
+% FIGURE %
+%%%%%%%%%%
+%\begin{figure}
+%\caption{Sound recording in the time and frequency domains}
+%\end{figure}
+
+%By analogy, in many quantum algorithms we can encode useful information
+%into the phases associated with the probability amplitudes of different
+%computational basis states. Our usual goal is to interfere these phases
+%both constructively and destructively, to maximize the probability of measuring
+%the computational basis state that corresponds to a correct answer to our
+%problem. The restriction is that we can only do this using local operations,
+%that, by operating on a few neighboring qubits at a time. Through this means,
+%we are effectively operating on many computational basis states in parallel,
+%due to the way quantum states combine through the tensor product structure.
+
+%[somewhere in the previous section, i unveil my famous spectrum picture
+%of quantum states, and demonstrate some examples of highly-entangled
+%states and product states]
+
+\subsection{The Product Representation}
+
+%In one domain, we have information encoded in the bits of the computational
+%basis states, but these are just encodings, and you can imagine them
+%evolving happily in their own separate alternate universes until one of them
+%is selected by random chance by a measurement at the end.
+%In the second domain, we have the phases of each computational basis state,
+%and the way we can get different computational basis states to interact, or
+%to create more or less of them, is through two-qubit entangling gates.
+%Actually, now we are on thin ice, and I should think carefully about what I
+%want to say here, especially as it relates to universality.
+
+Due to the tensor product structure of multi-qubit quantum states, we can
+perform the QFT by performing single-qubit and controlled-phase two-qubit
+rotations (the $R_k$ from Equation \ref{eqn:rk}). To do this, imagine that
+we have an $n$-qubit computational basis state $\ket{j}$ where
+qubit $\ket{j_i}$ has significance $2^i$ in our encoding. We now define the
+following single-qubit state with a rotation based on the binary fraction
+using bits $j_\ell$ through $j_n$, where $0.j_{\ell} j_{\ell-1} \ldots j_{n} =
+\sum_{m=\ell}^n 2^{-m}j_m$.
+
+\begin{equation}
+\ket{\phi(\ell)} = \frac{1}{\sqrt{2}}\left( \ket{0} +
+e^{2\pi i 0.j_\ell j_{\ell-1} \ldots j_n} \ket{1} \right)
+\end{equation}
+
+We can enact each $\ket{\phi(\ell)}$ by using $n-\ell$ rotations
+$R_k$ from Equation \ref{eqn:rk} controlled on qubits $\ket{j_\ell}$
+through $\ket{j_n}$.
+
+We can then express the QFT on a computational basis state $\ket{j}$ as
+the following tensor product of rotated single-qubit states, as proved in
+\cite{Nielsen2000}.
+
+\begin{equation}
+\ket{j_1, j_2, \ldots, j_n} = \bigotimes_{\ell=1}^{n} \ket{\phi(\ell)}
+\end{equation}
+
+%\begin{figure}
+%\caption{My famous rotating phase wheel picture}
+%end{figure}
+
+We note here that all the QFT circuits we will be discussing in this section
+assume the modulus is a power of two, namely $N=2^n$. In reality, we may
+approximate arbitrary moduli $m$ with $n'$ qubits where
+$n' = \lfloor\log m\rfloor + O(1)$ to within error $\epsilon$, which determines
+the circuit size and depth polynomially in $1/\epsilon$
+as described in \cite{Cleve2000}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{QFT in $O(n^2)$ Depth}
+
+The most well-known circuit for the QFT from Nielsen \& Chuang
+\cite{Nielsen2000} applies each of the following gates in sequence.
+
+For each qubit in $\ket{j_\ell}$, apply a Hadamard gate to get an equal mix of
+$\ket{0}$ and $\ket{1}$ for subsequence rotations. Then apply $n-\ell-1$
+$R_k$ rotations targeting $\ket{j_\ell}$ controlled on bits $\ket{j_{\ell+1}}$
+to $\ket{j_n}$, where qubit $\ket{j_m}$ controls a rotation $R_{m-\ell+1}$.
+
+%%%%%%%%%%
+% FIGURE %
+%%%%%%%%%%
+%\begin{figure}
+%\label{fig:qft-circuit}
+%\caption{The QFT circuit from Nielsen \& Chuang \cite{Nielsen2000}}.
+%\end{figure}
+
+The depth and size of operations are calculated as follows:
+
+\begin{equation}
+\sum_{\ell=1}^n n-\ell-1 = O(n^2)
+\end{equation}
+
+Also note that no ancillary qubits are needed, and the QFT is computed
+in-place. Therefore the circuit width is $n$, and the circuit space is
+$O(n^3)$ with an error probability of $0$ since this is an exact circuit.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{QFT in $O(n\log n)$ Depth}
+
+Almost immediately after Shor's original paper, Coppersmith noted that we
+could cut off the rotations $R_k$ after some maximum $k_0 = O(\log(n/\epsilon))$
+and therefore decrease
+our circuit size and depth to $O(n\log(n/\epsilon))$ for a given
+error $\epsilon$ \cite{Coppersmith1994}. We will call this the AQFT,
+for \emph{approximate QFT}. For circuits of size polynomial
+in $n$, it suffices to set $\epsilon = 1/poly(n)$, and therefore our
+circuit size and depth is $O(n\log(n))$. The circuit width remains the same
+as before, sothe circuit space is now $O(n^2\log(n))$ for
+error probability $1/poly(n)$.
+
+%%%%%%%%%%
+% FIGURE %
+%%%%%%%%%%
+%\begin{figure}
+%\label{fig:qft-approx}
+%\caption{Circuit for the approximate QFT}
+%\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{QFT in $O(n)$ Depth}
+
+It was noted by Moore and Nilsson \cite{Moore1998} and widely attributed
+to folklore that the QFT would be further parallelized by swapping qubits
+so that $R_k$ rotations that operated on disjoint qubits could be executed
+in the same timestep. Incidentally, this also makes the QFT implementable
+on a nearest-neighbor architecture, which was discovered by Kutin, Devitt,
+and Hollenberg \cite{Fowler2004} to have a pleasing triangular shape
+as shown in Figure \ref{fig:qft-fdh}. This fact was later
+used in the 1D NTC
+architecture of Kutin \cite{Kutin2006}.
+
+%%%%%%%%%%
+% FIGURE %
+%%%%%%%%%%
 \begin{figure}
 \label{fig:qft-fdh}
 \caption{The nearest-neighbor QFT circuit in 1D NTC \cite{Fowler2006}.}
 \end{figure}
 
-This, as you know, reduces the depth now to linear $O(n)$. The size and
-the space remain the same. So there you have it, it's more physical
-realistic, and it's more efficient. Voila!
+This reduces the depth to $O(n)$, while the size and width remain the same
+as before. Therefore, the circuit space is now $O(n^2)$, an improvement over
+the AQFT in the previous section but with an error probability of $0$ since
+this is an exact circuit.
 
-Also, it makes a pleasing triangular shape. This is what is used in the
-nested-adds controlled modular multiplier of Kutin later on in Section
-something or other.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{QFT in Depth $O(\log n)$}
 
-Oh, but this was just a tangent into physically realistic architectures.
-There is a QFT in linear depth according to folklore, according to Hoyer
-and Spalek, so we should try to figure that one out too. Maybe it's the same
-one.
+To further exploit the fact that operations on disjoint qubits can be done
+in parallel, Cleve and Watrous discovered that one could fanout the control
+qubit of every $R_k$ rotation. This uses the copying technique of
+Section \ref{sec:parallel}, which uses a logarithmic-depth \emph{copy network}
+of
+$CNOT$ gates to create $\ell-1$ entangled copies of a source qubit
+$\ket{j_\ell}$. Now every rotation controlled on $\ket{j_\ell}$ can be done
+in parallel, as shown in Figure \ref{fig:qft-cw}. We can combine
+this to use the
+result of the approximate QFT to cut off rotations after $\log(n/\epsilon)$
+bits.
 
-\subsection{The Parallelized QFT in Depth $O(\log n)$}
-
-Now we are moving into grown-up techniques which are non-trivial, the
-parallel QFT of Cleve \& Watrous which achieve logarithmic depth. Although in
-my opinion, erasing the ancillae is overrated. Oh this should set the general
-tone of the report. In the beginning I have an engineer's perspective, and
-have my sights set on quantum computer engineering. So I don't really care
-about things like erasing the ancillae nicely or neglecting the classical
-controller just to make a fair comparison and be able to compare circuit
-complexity classes directly. So I actually think Cleve \& Watrous going through
-all this work to erase their ancillae is silly, especially since you can just
-keep it around as garbage. Or even measure it presumably, and then you
-automatically have a product state. Am I missing something here? FACT CHECK.
-Or simulate in QCL.
-
+%%%%%%%%%%
+% FIGURE %
+%%%%%%%%%%
 \begin{figure}
 \label{fig:qft-cw}
 \caption{The parallel QFT of Cleve and Watrous}
 \end{figure}
 
-The above is a picture using the parallel timestep and log-depth fanout of
-the qubits. We can mention here the connection to unbounded fanout techniques which
-would make this constant depth.
+Furthermore, each copy network for all $n$ bits $\ket{j_\ell}$ can be done
+in parallel.
+Therefore, the circuit's depth is now only limited by the copy networks
+and is now $O(\log n)$. The size remains unchanged asymptotically, but now
+the circuit width is $O(n^2)$ to include the ancillae for the copy networks.
+The circuit space is therefore $O(n^3\log\log(n/\epsilon)$. The size and
+error probability is
+the same as the AQFT.
 
-This technique trades space for time, and is basically analogous to the
-approach of Super-Kitaev. We should actually describe the Super-Kitaev
-approach since we are more familiar with it. By creating multiple QFT states,
-hmm, let's see if I actually know how to explain this.
+\subsection{QFT Summary}
 
-\subsection{The Approximate QFT in Depth $O(1)$}
+Here is a table summarizing circuit size, depth, width, space, and
+error probability. For the approximate circuits, we set $\epsilon = 1/O(n^2)$,
+since this is the per-gate error we would need to get a constant
+error probability for a QFT circuit on $n$ qubits with size $O(n^2)$.
 
-Well, this is in the Hoyer-Spalek paper. Getting down to exact QFT in 
-constant-depth is in BKP, which I can reference here, but I will leave this as
-a later thing to read more on if I have time.
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{Author} & \textbf{Depth} & \textbf{Size} & \textbf{Width} & \textbf{Space} & \textbf{Error}\\
+\hline
+Shor & $O(n^2)$ & $O(n^2)$ & $O(n)$ & $O(n^3)$ & 0\\
+Coppersmith & $O(n\log n)$ & $O(n\log n)$ & $O(n)$ & $O(n^2\log n)$ & $1/O(n^2)$ \\
+Folklore & $O(n)$ & $O(n^2)$ & $O(n)$ & $O(n^2)$ & 0\\
+CW & $O(\log n)$ & $O(n^2)$ & $O(n^2)$ & $O(n^2 \log n)$ & 0\\
+CW & $O(\log \log n)$ & $O(n \log n)$ & $O(n^2)$ & $O(n^2 \log\log n)$ & $1/O(n^2)$\\
+BKP & $O(1)$ & $O(n^2)$ & $O(n^2)$ & $O(n^2)$ & 0\\
+\hline
+\end{tabular}
 
-Actually, I have no idea how this works at all, even in the approximate case.
-But by reading the Hoyer/Spalek paper, I can get a better sense of the
-differences between $2^n$ and arbitrary moduli.
-
-\subsection{The Semi-Classical QFT Circuit in Width}
-
-This is the Beauregard circuit, but it is really for phase estimation.
-I need to think some more before I go around indiscriminately trying to compare
-it directly to other QFT circuits.
-
-\subsection{Open Problems}
-
-Optimizing the QFT circuit even more in terms of improving its space-success
-product. 
+Cleve and Watrous mention the open problem of computing an exact QFT in
+sub-logarithmic depth. However, this predates the constant-depth result of
+BKP, where the logarithmic-depth copy network can be replaced with a
+constant-depth unbounded fanout. Therefore, BKP answers their open
+question in the affirmative. BKP can also be used to implement an
+AQFT with improved circuit space, but there is no further depth improvement
+possible. By introducing circuit space, we hope to provide another parameter
+for continuing to improve QFT circuits in the future that will affect
+practical implementations.
