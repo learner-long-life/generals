@@ -1,4 +1,4 @@
-@article{Berry2006,
+@article{Berry2005,
 abstract = {We present an efficient quantum algorithm for simulating the evolution of a sparse Hamiltonian H for a given time t in terms of a procedure for computing the matrix entries of H. In particular, when H acts on n qubits, has at most a constant number of nonzero entries in each row/column, and |H| is bounded by a constant, we may select any positive integer \$k\$ such that the simulation requires O(($\backslash$log\^{}*n)t\^{}\{1+1/2k\}) accesses to matrix entries of H. We show that the temporal scaling cannot be significantly improved beyond this, because sublinear time scaling is not possible.},
 archivePrefix = {arXiv},
 arxivId = {quant-ph/0508139},
@@ -39,6 +39,25 @@ volume = {80},
 year = {2009}
 }
 
+@article{Raussendorf2003,
+abstract = {We give a detailed account of the one-way quantum computer, a scheme of quantum computation that consists entirely of one-qubit measurements on a particular class of entangled states, the cluster states. We prove its universality, describe why its underlying computational model is different from the network model of quantum computation and relate quantum algorithms to mathematical graphs. Further we investigate the scaling of required resources and give a number of examples for circuits of practical interest such as the circuit for quantum Fourier transformation and for the quantum adder. Finally, we describe computation with clusters of finite size.},
+archivePrefix = {arXiv},
+arxivId = {quant-ph/0301052},
+author = {Raussendorf, Robert and Browne, Daniel and Briegel, Hans},
+doi = {10.1103/PhysRevA.68.022312},
+eprint = {0301052},
+issn = {1050-2947},
+journal = {Physical Review A},
+keywords = {Quantum Physics},
+month = aug,
+number = {2},
+primaryClass = {quant-ph},
+title = {{Measurement-based quantum computation on cluster states}},
+url = {http://arxiv.org/abs/quant-ph/0301052},
+volume = {68},
+year = {2003}
+}
+
 @article{Hoyer2002,
 abstract = {We demonstrate that the unbounded fan-out gate is very powerful. Constant-depth polynomial-size quantum circuits with bounded fan-in and unbounded fan-out over a fixed basis (denoted by QNCf\^{}0) can approximate with polynomially small error the following gates: parity, mod[q], And, Or, majority, threshold[t], exact[q], and Counting. Classically, we need logarithmic depth even if we can use unbounded fan-in gates. If we allow arbitrary one-qubit gates instead of a fixed basis, then these circuits can also be made exact in log-star depth. Sorting, arithmetical operations, phase estimation, and the quantum Fourier transform with arbitrary moduli can also be approximated in constant depth.},
 archivePrefix = {arXiv},
@@ -71,7 +90,7 @@ url = {http://arxiv.org/abs/quant-ph/0609001},
 year = {2006}
 }
 
-@article{Reichardt2005,
+@article{Reichardt2004,
 abstract = {Given stabilizer operations and the ability to repeatedly prepare a single-qubit mixed state rho, can we do universal quantum computation? As motivation for this question, "magic state" distillation procedures can reduce the general fault-tolerance problem to that of performing fault-tolerant stabilizer circuits. We improve the procedures of Bravyi and Kitaev in the Hadamard "magic" direction of the Bloch sphere to achieve a sharp threshold between those rho allowing universal quantum computation, and those for which any calculation can be efficiently classically simulated. As a corollary, the ability to repeatedly prepare any pure state which is not a stabilizer state (e.g., any single-qubit pure state which is not a Pauli eigenstate), together with stabilizer operations, gives quantum universality. It remains open whether there is also a tight separation in the so-called T direction.},
 archivePrefix = {arXiv},
 arxivId = {quant-ph/0411036},
@@ -118,7 +137,7 @@ title = {{Fast versions of Shor ’ s quantum factoring algorithm}},
 year = {1998}
 }
 
-@article{Zalka2006a,
+@article{Zalka2006,
 abstract = {In this note we consider optimised circuits for implementing Shor's quantum factoring algorithm. First I give a circuit for which none of the about 2n qubits need to be initialised (though we still have to make the usual 2n measurements later on). Then I show how the modular additions in the algorithm can be carried out with a superposition of an arithmetic sequence. This makes parallelisation of Shor's algorithm easier. Finally I show how one can factor with only about 1.5n qubits, and maybe even fewer.},
 archivePrefix = {arXiv},
 arxivId = {quant-ph/0601097},
@@ -185,6 +204,13 @@ month = Feb,
 year = 2012,
 note = "Unpublished manuscript"
 }
+
+@unpublished{Booth2012,
+author = "Jeffrey Booth",
+title = "Quantum compiler optimizations",
+month = Feb,
+year = 2012,
+note = "Unpublished manuscript"}
 
 @article{Shor1995,
 abstract = {A digital computer is generally believed to be an efficient universal computing device; that is, it is believed able to simulate any physical computing device with an increase in computation time of at most a polynomial factor. This may not be true when quantum mechanics is taken into consideration. This paper considers factoring integers and finding discrete logarithms, two problems which are generally thought to be hard on a classical computer and have been used as the basis of several proposed cryptosystems. Efficient randomized algorithms are given for these two problems on a hypothetical quantum computer. These algorithms take a number of steps polynomial in the input size, e.g., the number of digits of the integer to be factored.},
@@ -419,4 +445,258 @@ year = {2009}
   pages={1971--1974},
   year={1999},
   publisher={APS}
+}
+
+@article{Hoeffding1963,
+  title={Probability inequalities for sums of bounded random variables},
+  author={Hoeffding, W.},
+  journal={Journal of the American Statistical Association},
+  pages={13--30},
+  year={1963},
+  publisher={JSTOR}
+}
+
+@inproceedings{ODonnell2008,
+  title={Some topics in analysis of Boolean functions},
+  author={O'Donnell, R.},
+  booktitle={Proceedings of the 40th annual ACM symposium on Theory of computing},
+  pages={569--578},
+  year={2008},
+  organization={ACM}
+}
+
+@article{Blakestad2011,
+abstract = {We have demonstrated transport of Be+ ions through a 2D Paul-trap array that incorporates an X-junction, while maintaining the ions near the motional ground-state of the confining potential well. We expand on the first report of the experiment [1], including a detailed discussion of how the transport potentials were calculated. Two main mechanisms that caused motional excitation during transport are explained, along with the methods used to mitigate such excitation. We reduced the motional excitation below the results in Ref. [1] by a factor of approximately 50. The effect of a mu-metal shield on qubit coherence is also reported. Finally, we examined a method for exchanging energy between multiple motional modes on the few-quanta level, which could be useful for cooling motional modes without directly accessing the modes with lasers. These results establish how trapped ions can be transported in a large-scale quantum processor with high fidelity.},
+archivePrefix = {arXiv},
+arxivId = {1106.5005},
+author = {Blakestad, R. B. and Ospelkaus, C. and VanDevender, A. P. and Wesenberg, J. H. and Biercuk, M. J. and Leibfried, D. and Wineland, D. J.},
+eprint = {1106.5005},
+month = jun,
+pages = {16},
+title = {{Improved high-fidelity transport of trapped-ion qubits through a multi-dimensional array}},
+url = {http://arxiv.org/abs/1106.5005},
+year = {2011}
+}
+
+@phdthesis{VanMeter2006,
+archivePrefix = {arXiv},
+arxivId = {arXiv:quant-ph/0607065v1},
+author = {{Van Meter}, Rodney},
+eprint = {0607065v1},
+file = {:Users/ppham/Documents/arXiv/Rodney Van Meter Thesis.pdf:pdf},
+number = {February},
+primaryClass = {arXiv:quant-ph},
+school = {Keio University},
+title = {{Architecture of a Quantum Multicomputer Optimized for Shor’s Factoring Algorithm}},
+type = {Ph.D.},
+url = {http://arxiv.org/abs/quant-ph/0607065},
+year = {2008}
+}
+
+@article{Choi2010,
+abstract = {In this work, we propose an adder for the 2D NTC architecture, designed to match the architectural constraints of many quantum computing technologies. The chosen architecture allows the layout of logical qubits in two dimensions and the concurrent execution of one- and two-qubit gates with nearest-neighbor interaction only. The proposed adder works in three phases. In the first phase, the first column generates the summation output and the other columns do the carry-lookahead operations. In the second phase, these intermediate values are propagated from column to column, preparing for computation of the final carry for each register position. In the last phase, each column, except the first one, generates the summation output using this column-level carry. The depth and the number of qubits of the proposed adder are \$\backslash Theta(\backslash sqrt\{n\})\$ and O(n), respectively. The proposed adder executes faster than the adders designed for the 1D NTC architecture when the length of the input registers \$n\$ is larger than 58.},
+archivePrefix = {arXiv},
+arxivId = {1008.5093},
+author = {Choi, Byung-Soo and {Van Meter}, Rodney},
+eprint = {1008.5093},
+file = {::},
+keywords = {Architecture,Quantum Physics},
+month = aug,
+title = {{"$\Theta(\sqrt{n})$"-depth Quantum Adder on a 2D NTC Quantum Computer Architecture}},
+url = {http://arxiv.org/abs/1008.5093},
+year = {2010}
+}
+
+@article{Bonderson2010,
+abstract = {The advancement of information processing into the realm of quantum mechanics promises a transcendence in computational power that will enable problems to be solved which are completely beyond the known abilities of any "classical" computer, including any potential non-quantum technologies the future may bring. However, the fragility of quantum states poses a challenging obstacle for realization of a fault-tolerant quantum computer. The topological approach to quantum computation proposes to surmount this obstacle by using special physical systems -- non-Abelian topologically ordered phases of matter -- that would provide intrinsic fault-tolerance at the hardware level. The so-called "Ising-type" non-Abelian topological order is likely to be physically realized in a number of systems, but it can only provide a universal gate set (a requisite for quantum computation) if one has the ability to perform certain dynamical topology-changing operations on the system. Until now, practical methods of implementing these operations were unknown. Here we show how the necessary operations can be physically implemented for Ising-type systems realized in the recently proposed superconductor-semiconductor and superconductor-topological insulator heterostructures. Furthermore, we specify routines employing these methods to generate a computationally universal gate set. We are consequently able to provide a schematic blueprint for a fully topologically-protected Ising based quantum computer using currently available materials and techniques. This may serve as a starting point for attempts to construct a fault-tolerant quantum computer, which will have applications to cryptanalysis, drug design, efficient simulation of quantum many-body systems, solution of large systems of linear equations, searching large databases, engineering future quantum computers, and -- most importantly -- those applications which no one in our classical era has the prescience to foresee.},
+archivePrefix = {arXiv},
+arxivId = {1003.2856},
+author = {Bonderson, Parsa and Sarma, Sankar Das and Freedman, Michael and Nayak, Chetan},
+eprint = {1003.2856},
+file = {:Users/ppham/Library/Application Support/Mendeley Desktop/Downloaded/Bonderson et al. - 2010 - A Blueprint for a Topologically Fault-tolerant Quantum Computer.pdf:pdf},
+keywords = {Mesoscale and Nanoscale Physics,Quantum Physics,Strongly Correlated Electrons},
+month = mar,
+pages = {6},
+title = {{A Blueprint for a Topologically Fault-tolerant Quantum Computer}},
+url = {http://arxiv.org/abs/1003.2856},
+year = {2010}
+}
+
+@article{Dawson2005,
+abstract = {This pedagogical review presents the proof of the Solovay-Kitaev theorem in the form of an efficient classical algorithm for compiling an arbitrary single-qubit gate into a sequence of gates from a fixed and finite set. The algorithm can be used, for example, to compile Shor's algorithm, which uses rotations of \$\backslash pi / 2\^{}k\$, into an efficient fault-tolerant form using only Hadamard, controlled-\{$\backslash$sc not\}, and \$\backslash pi / 8\$ gates. The algorithm runs in \$O(\backslash log\^{}\{2.71\}(1/\backslash epsilon))\$ time, and produces as output a sequence of \$O(\backslash log\^{}\{3.97\}(1/\backslash epsilon))\$ quantum gates which is guaranteed to approximate the desired quantum gate to an accuracy within \$\backslash epsilon > 0\$. We also explain how the algorithm can be generalized to apply to multi-qubit gates and to gates from \$SU(d)\$.},
+arxivId = {quant-ph/0505030},
+author = {Dawson, Christopher M. and Nielsen, Michael A.},
+file = {:Users/buy-ppham/Library/Application Support/Mendeley Desktop/Downloaded/Dawson, Nielsen - 2005 - The Solovay-Kitaev algorithm.pdf:pdf},
+keywords = {Quantum Physics},
+month = may,
+pages = {15},
+title = {{The Solovay-Kitaev algorithm}},
+url = {http://arxiv.org/abs/quant-ph/0505030},
+eprint = {quant-ph/0505030},
+year = {2005}
+}
+
+@article{Aho2003,
+archivePrefix = {arXiv},
+arxivId = {arXiv:quant-ph/0311008v1},
+author = {Aho, Alfred V and York, New and Svore, Krysta M},
+eprint = {0311008v1},
+file = {:Users/ppham/Dropbox/arXiv/0311008v1.pdf:pdf},
+journal = {Science},
+pages = {1--17},
+primaryClass = {arXiv:quant-ph},
+title = {{Compiling Quantum Circuits using the Palindrome Transform arXiv : quant-ph / 0311008v1 3 Nov 2003}},
+year = {2003}
+}
+
+@article{Shor1994,
+abstract = {A digital computer is generally believed to be an efficient universal computing device; that is, it is believed able to simulate any physical computing device with an increase in computation time of at most a polynomial factor. This may not be true when quantum mechanics is taken into consideration. This paper considers factoring integers and finding discrete logarithms, two problems which are generally thought to be hard on a classical computer and have been used as the basis of several proposed cryptosystems. Efficient randomized algorithms are given for these two problems on a hypothetical quantum computer. These algorithms take a number of steps polynomial in the input size, e.g., the number of digits of the integer to be factored.},
+archivePrefix = {arXiv},
+arxivId = {quant-ph/9508027},
+author = {Shor, Peter W.},
+eprint = {9508027},
+file = {::},
+keywords = {Quantum Physics},
+month = aug,
+pages = {28},
+primaryClass = {quant-ph},
+title = {{Polynomial-Time Algorithms for Prime Factorization and Discrete Logarithms on a Quantum Computer}},
+url = {http://arxiv.org/abs/quant-ph/9508027},
+year = {1995}
+}
+
+@article{Knill1998,
+  title={Power of one bit of quantum information},
+  author={Knill, E. and Laflamme, R.},
+  journal={Physical Review Letters},
+  volume={81},
+  number={25},
+  pages={5672--5675},
+  year={1998},
+  publisher={APS}
+}
+
+@article{Bravyi2004,
+abstract = {We consider a model of quantum computation in which the set of elementary operations is limited to Clifford unitaries, the creation of the state \$|0>\$, and qubit measurement in the computational basis. In addition, we allow the creation of a one-qubit ancilla in a mixed state \$\backslash rho\$, which should be regarded as a parameter of the model. Our goal is to determine for which \$\backslash rho\$ universal quantum computation (UQC) can be efficiently simulated. To answer this question, we construct purification protocols that consume several copies of \$\backslash rho\$ and produce a single output qubit with higher polarization. The protocols allow one to increase the polarization only along certain ``magic'' directions. If the polarization of \$\backslash rho\$ along a magic direction exceeds a threshold value (about 65\%), the purification asymptotically yields a pure state, which we call a magic state. We show that the Clifford group operations combined with magic states preparation are sufficient for UQC. The connection of our results with the Gottesman-Knill theorem is discussed.},
+archivePrefix = {arXiv},
+arxivId = {quant-ph/0403025},
+author = {Bravyi, Sergey and Kitaev, Alexei},
+doi = {10.1103/PhysRevA.71.022316},
+eprint = {0403025},
+issn = {1050-2947},
+journal = {Physical Review A},
+month = feb,
+number = {2},
+pages = {15},
+primaryClass = {quant-ph},
+title = {{Universal quantum computation with ideal Clifford gates and noisy ancillas}},
+url = {http://arxiv.org/abs/quant-ph/0403025},
+volume = {71},
+year = {2005}
+}
+
+@article{Aharonov2003,
+abstract = {The design of new quantum algorithms has proven to be an extremely difficult task. This paper considers a different approach to the problem, by studying the problem of 'quantum state generation'. This approach provides intriguing links between many different areas: quantum computation, adiabatic evolution, analysis of spectral gaps and groundstates of Hamiltonians, rapidly mixing Markov chains, the complexity class statistical zero knowledge, quantum random walks, and more. We first show that many natural candidates for quantum algorithms can be cast as a state generation problem. We define a paradigm for state generation, called 'adiabatic state generation' and develop tools for adiabatic state generation which include methods for implementing very general Hamiltonians and ways to guarantee non negligible spectral gaps. We use our tools to prove that adiabatic state generation is equivalent to state generation in the standard quantum computing model, and finally we show how to apply our techniques to generate interesting superpositions related to Markov chains.},
+archivePrefix = {arXiv},
+arxivId = {quant-ph/0301023},
+author = {Aharonov, Dorit and Ta-Shma, Amnon},
+eprint = {0301023},
+file = {:Users/ppham/Dropbox/arXiv/0301023v2.pdf:pdf},
+month = jan,
+pages = {35},
+primaryClass = {quant-ph},
+title = {{Adiabatic Quantum State Generation and Statistical Zero Knowledge}},
+url = {http://arxiv.org/abs/quant-ph/0301023},
+year = {2003}
+}
+
+@article{Feynman1982,
+  title={Simulating physics with computers},
+  author={Feynman, R.P.},
+  journal={International journal of theoretical physics},
+  volume={21},
+  number={6},
+  pages={467--488},
+  year={1982},
+  publisher={Springer}
+}
+
+@article{Lloyd1996,
+  title={Universal quantum simulators},
+  author={Lloyd, S. and others},
+  journal={Science},
+  pages={1073--1077},
+  year={1996},
+  publisher={American Association for the Advancement of Science}
+}
+
+@article{Knill2004,
+abstract = {Postselected quantum computation is distinguished from regular quantum computation by accepting the output only if measurement outcomes satisfy predetermined conditions. The output must be accepted with nonzero probability. Methods for implementing postselected quantum computation with noisy gates are proposed. These methods are based on error-detecting codes. Conditionally on detecting no errors, it is expected that the encoded computation can be made to be arbitrarily accurate. Although the probability of success of the encoded computation decreases dramatically with accuracy, it is possible to apply the proposed methods to the problem of preparing arbitrary stabilizer states in large error-correcting codes with local residual errors. Together with teleported error-correction, this may improve the error tolerance of non-postselected quantum computation.},
+archivePrefix = {arXiv},
+arxivId = {quant-ph/0402171},
+author = {Knill, E.},
+eprint = {0402171},
+month = feb,
+pages = {17},
+primaryClass = {quant-ph},
+title = {{Fault-Tolerant Postselected Quantum Computation: Schemes}},
+url = {http://arxiv.org/abs/quant-ph/0402171},
+year = {2004}
+}
+
+@article{Ambainis2002,
+abstract = {Quantum entanglement distillation protocols are LOCC protocols between Alice and Bob that convert imperfect EPR pairs, or, in general, partially entangled bipartite states into perfect or near-perfect EPR pairs. The classical communication complexity of these protocols is the minimal amount of classical communication needed for the conversion. In this paper, we focus on the communication complexity of protocols that operate with incomplete information, i.e., where the inputs are mixed states and/or prepared adversarially.   We study 3 models of imperfect EPR pairs. In the measure-r model, r out of n EPR pairs are measured by an adversary; in the depolarization model, Bob's share of qubits underwent a depolarization channel; in the fidelity model, the only information Alice and Bob possess is the fidelity of the shared state.   For the measure-r model and the depolarization model, we prove tight and almost-tight bounds on the outcome of LOCC protocols that don't use communication. For the fidelity model, we prove a lower bound on the communication complexity that matches the upper bound given by Ambainis, Smith, and Yang [ASY02].},
+archivePrefix = {arXiv},
+arxivId = {quant-ph/0207090},
+author = {Ambainis, Andris and Yang, Ke},
+eprint = {0207090},
+month = jul,
+pages = {20},
+primaryClass = {quant-ph},
+title = {{Towards the Classical Communication Complexity of Entanglement Distillation Protocols with Incomplete Information}},
+url = {http://arxiv.org/abs/quant-ph/0207090},
+year = {2002}
+}
+
+@article{Bennett1973,
+author = {Bennett, Charles},
+file = {:Users/ppham/Dropbox/arXiv/bennett1973.pdf:pdf},
+journal = {Atomic Energy},
+number = {November},
+title = {{Logical Reversibility of Computation}},
+year = {1973}
+}
+
+@article{Gottesman1997,
+abstract = {In order to use quantum error-correcting codes to actually improve the performance of a quantum computer, it is necessary to be able to perform operations fault-tolerantly on encoded states. I present a general theory of fault-tolerant operations based on symmetries of the code stabilizer. This allows a straightforward determination of which operations can be performed fault-tolerantly on a given code. I demonstrate that fault-tolerant universal computation is possible for any stabilizer code. I discuss a number of examples in more detail, including the five-qubit code.},
+archivePrefix = {arXiv},
+arxivId = {quant-ph/9702029},
+author = {Gottesman, Daniel},
+doi = {10.1103/PhysRevA.57.127},
+eprint = {9702029},
+issn = {1050-2947},
+journal = {Physical Review A},
+month = jan,
+number = {1},
+pages = {127--137},
+primaryClass = {quant-ph},
+title = {{Theory of fault-tolerant quantum computation}},
+url = {http://arxiv.org/abs/quant-ph/9702029},
+volume = {57},
+year = {1998}
+}
+
+@article{Browne2009,
+abstract = {We prove that one-way quantum computations have the same computational power as quantum circuits with unbounded fan-out. It demonstrates that the one-way model is not only one of the most promising models of physical realisation, but also a very powerful model of quantum computation. It confirms and completes previous results which have pointed out, for some specific problems, a depth separation between the one-way model and the quantum circuit model. Since one-way model has the same computational power as unbounded quantum fan-out circuits, the quantum Fourier transform can be approximated in constant depth in the one-way model, and thus the factorisation can be done by a polytime probabilistic classical algorithm which has access to a constant-depth one-way quantum computer. The extra power of the one-way model, comparing with the quantum circuit model, comes from its classical-quantum hybrid nature. We show that this extra power is reduced to the capability to perform unbounded classical parity gates in constant depth.},
+archivePrefix = {arXiv},
+arxivId = {0909.4673},
+author = {Browne, Dan E. and Kashefi, Elham and Perdrix, Simon},
+eprint = {0909.4673},
+file = {:Users/ppham/Dropbox/arXiv/0909.4673v1.pdf:pdf},
+keywords = {Quantum Physics},
+month = sep,
+pages = {12},
+title = {{Computational depth complexity of measurement-based quantum computation}},
+url = {http://arxiv.org/abs/0909.4673},
+year = {2009}
 }

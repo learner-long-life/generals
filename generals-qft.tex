@@ -172,27 +172,28 @@ as described in \cite{Cleve2000}.
 \label{subsec:qft-quad}
 
 The most well-known circuit for the QFT from Nielsen \& Chuang
-\cite{Nielsen2000} applies each of the following gates in sequence.
+\cite{Nielsen2000} applies each of the following gates in sequence, as shown
+in Figure \ref{fig:qft-serial}.
 
 For each qubit in $\ket{j_\ell}$, apply a Hadamard gate to get an equal mix of
 $\ket{0}$ and $\ket{1}$ for subsequence rotations. Then apply $n-\ell-1$
 $R_k$ rotations targeting $\ket{j_\ell}$ controlled on bits $\ket{j_{\ell+1}}$
 to $\ket{j_n}$, where qubit $\ket{j_m}$ controls a rotation $R_{m-\ell+1}$.
 
-%%%%%%%%%%
-% FIGURE %
-%%%%%%%%%%
-%\begin{figure}
-%\label{fig:qft-circuit}
-%\caption{The QFT circuit from Nielsen \& Chuang \cite{Nielsen2000}}.
-%\end{figure}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=3in]{figures/serial_qft.pdf}
+\caption{The serial QFT circuit \cite{Fowler2004}.}
+\label{fig:qft-serial}
+\end{center}
+\end{figure}
 
-The depth and size of operations are calculated as follows:
+%\begin{equation}
+%\label{eqn:qft-quad}
+%\end{equation}
 
-\begin{equation}
-\sum_{\ell=1}^n n-\ell-1 = O(n^2)
-\end{equation}
-
+The depth and size of operations are calculated as
+$\sum_{\ell=1}^n n-\ell-1 = O(n^2)$.
 Also note that no ancillary qubits are needed, and the QFT is computed
 in-place. Therefore the circuit width is $n$, and the circuit space is
 $O(n^3)$ with an error probability of $0$ since this is an exact circuit.
@@ -209,7 +210,7 @@ error $\epsilon$ \cite{Coppersmith1994}. We will call this the AQFT,
 for \emph{approximate QFT}. For circuits of size polynomial
 in $n$, it suffices to set $\epsilon = 1/poly(n)$, and therefore our
 circuit size and depth is $O(n\log(n))$. The circuit width remains the same
-as before, sothe circuit space is now $O(n^2\log(n))$ for
+as before, so the circuit space is now $O(n^2\log(n))$ for
 error probability $1/poly(n)$.
 
 %%%%%%%%%%
@@ -230,7 +231,7 @@ so that $R_k$ rotations that operated on disjoint qubits could be executed
 in the same timestep. Incidentally, this also makes the QFT implementable
 on a nearest-neighbor architecture, which was discovered by Kutin, Devitt,
 and Hollenberg \cite{Fowler2004} to have a pleasing triangular shape
-as shown in Figure \ref{fig:qft-fdh}. This fact was later
+as shown in Figure \ref{fig:qft-parallel}. This fact was later
 used in the 1D NTC
 architecture of Kutin \cite{Kutin2006}.
 
@@ -238,8 +239,9 @@ architecture of Kutin \cite{Kutin2006}.
 % FIGURE %
 %%%%%%%%%%
 \begin{figure}
-\label{fig:qft-fdh}
-\caption{The nearest-neighbor QFT circuit in 1D NTC \cite{Fowler2004}.}
+\includegraphics[width=3in]{figures/parallel_qft.pdf}
+\caption{The parallel 1D NTC QFT circuit \cite{Fowler2004}.}
+\label{fig:qft-parallel}
 \end{figure}
 
 This reduces the depth to $O(n)$, while the size and width remain the same
@@ -256,19 +258,137 @@ in parallel, Cleve and Watrous discovered that one could fanout the control
 qubit of every $R_k$ rotation. This uses the copying technique of
 Section \ref{sec:parallel}, which uses a logarithmic-depth \emph{copy network}
 of
-$CNOT$ gates to create $\ell-1$ entangled copies of a source qubit
+CNOT gates to create $\ell-1$ entangled copies of a source qubit
 $\ket{j_\ell}$. Now every rotation controlled on $\ket{j_\ell}$ can be done
 in parallel, as shown in Figure \ref{fig:qft-cw}. We can combine
 this to use the
 result of the approximate QFT to cut off rotations after $\log(n/\epsilon)$
 bits.
 
-%%%%%%%%%%
-% FIGURE %
-%%%%%%%%%%
-\begin{figure}
+\begin{figure}[!ht]
+\rule{1cm}{0cm}
+\setlength{\unitlength}{965sp}%
+%
+\begingroup\makeatletter\ifx\SetFigFont\undefined
+% extract first six characters in \fmtname
+\def\x#1#2#3#4#5#6#7\relax{\def\x{#1#2#3#4#5#6}}%
+\expandafter\x\fmtname xxxxxx\relax \def\y{splain}%
+\ifx\x\y   % LaTeX or SliTeX?
+\gdef\SetFigFont#1#2#3{%
+  \ifnum #1<17\tiny\else \ifnum #1<20\small\else
+  \ifnum #1<24\normalsize\else \ifnum #1<29\large\else
+  \ifnum #1<34\Large\else \ifnum #1<41\LARGE\else
+     \huge\fi\fi\fi\fi\fi\fi
+  \csname #3\endcsname}%
+\else
+\gdef\SetFigFont#1#2#3{\begingroup
+  \count@#1\relax \ifnum 25<\count@\count@25\fi
+  \def\x{\endgroup\@setsize\SetFigFont{#2pt}}%
+  \expandafter\x
+    \csname \romannumeral\the\count@ pt\expandafter\endcsname
+    \csname @\romannumeral\the\count@ pt\endcsname
+  \csname #3\endcsname}%
+\fi
+\fi\endgroup
+\begin{picture}(8910,5495)(376,-6744)
+\thinlines
+\put(4801,-3061){\circle*{150}}
+\put(4801,-3661){\circle*{150}}
+\put(4801,-1561){\circle*{150}}
+\put(4801,-2461){\circle*{150}}
+\put(4801,-2161){\circle{150}}
+\put(4801,-2761){\circle{150}}
+\put(4801,-3361){\circle{150}}
+\put(4801,-3961){\circle{150}}
+\put(4801,-1561){\line( 0,-1){675}}
+\put(4801,-2461){\line( 0,-1){375}}
+\put(4801,-3061){\line( 0,-1){375}}
+\put(4801,-3661){\line( 0,-1){375}}
+\put(4201,-1561){\circle*{150}}
+\put(4201,-3061){\circle*{150}}
+\put(4201,-3661){\circle{150}}
+\put(4201,-2461){\circle{150}}
+\put(4201,-1561){\line( 0,-1){975}}
+\put(4201,-3061){\line( 0,-1){675}}
+\put(3601,-1561){\circle*{150}}
+\put(3601,-3061){\circle{150}}
+\put(3601,-1561){\line( 0,-1){1575}}
+\put(7201,-3061){\circle*{150}}
+\put(7201,-3661){\circle*{150}}
+\put(7201,-1561){\circle*{150}}
+\put(7201,-2461){\circle*{150}}
+\put(7201,-2161){\circle{150}}
+\put(7201,-2761){\circle{150}}
+\put(7201,-3361){\circle{150}}
+\put(7201,-3961){\circle{150}}
+\put(7201,-1561){\line( 0,-1){675}}
+\put(7201,-2461){\line( 0,-1){375}}
+\put(7201,-3061){\line( 0,-1){375}}
+\put(7201,-3661){\line( 0,-1){375}}
+\put(7801,-1561){\circle*{150}}
+\put(7801,-3061){\circle*{150}}
+\put(7801,-3661){\circle{150}}
+\put(7801,-2461){\circle{150}}
+\put(7801,-1561){\line( 0,-1){975}}
+\put(7801,-3061){\line( 0,-1){675}}
+\put(8401,-1561){\circle*{150}}
+\put(8401,-3061){\circle{150}}
+\put(8401,-1561){\line( 0,-1){1575}}
+\put(5401,-4561){\circle*{150}}
+\put(5551,-4861){\circle*{150}}
+\put(5701,-5161){\circle*{150}}
+\put(5851,-5461){\circle*{150}}
+\put(6001,-5761){\circle*{150}}
+\put(6151,-6061){\circle*{150}}
+\put(6301,-6361){\circle*{150}}
+\put(6451,-6661){\circle*{150}}
+\put(5401,-1561){\circle*{150}}
+\put(5551,-2161){\circle*{150}}
+\put(5701,-2461){\circle*{150}}
+\put(5851,-2761){\circle*{150}}
+\put(6001,-3061){\circle*{150}}
+\put(6151,-3361){\circle*{150}}
+\put(6301,-3661){\circle*{150}}
+\put(6451,-3961){\circle*{150}}
+\put(2401,-1861){\framebox(600,600){\large H}}
+\put(1801,-1561){\line( 1, 0){600}}
+\put(5401,-1561){\line( 0,-1){3000}}
+\put(5551,-2161){\line( 0,-1){2700}}
+\put(5701,-2461){\line( 0,-1){2700}}
+\put(5851,-2761){\line( 0,-1){2700}}
+\put(6001,-3061){\line( 0,-1){2700}}
+\put(6151,-3361){\line( 0,-1){2700}}
+\put(6301,-3661){\line( 0,-1){2700}}
+\put(6451,-3961){\line( 0,-1){2700}}
+\put(3001,-1561){\line( 1, 0){6000}}
+\put(1801,-2161){\line( 1, 0){7200}}
+\put(1801,-2461){\line( 1, 0){7200}}
+\put(1801,-2761){\line( 1, 0){7200}}
+\put(1801,-3061){\line( 1, 0){7200}}
+\put(1801,-3361){\line( 1, 0){7200}}
+\put(1801,-3661){\line( 1, 0){7200}}
+\put(1801,-3961){\line( 1, 0){7200}}
+\put(1801,-4561){\line( 1, 0){7200}}
+\put(1801,-4861){\line( 1, 0){7200}}
+\put(1801,-5161){\line( 1, 0){7200}}
+\put(1801,-5461){\line( 1, 0){7200}}
+\put(1801,-5761){\line( 1, 0){7200}}
+\put(1801,-6061){\line( 1, 0){7200}}
+\put(1801,-6361){\line( 1, 0){7200}}
+\put(1801,-6661){\line( 1, 0){7200}}
+\put(9500,-1681){\makebox(0,0)[lb]{$\ket{\mu_{0.x_j\cdots x_0}}$}}
+\put(9500,-3166){\makebox(0,0)[lb]{$\ket{0^{j}}$}}
+\put(9500,-4700){\makebox(0,0)[lb]{$\ket{x_j}$}}
+\put(800,-4700){\makebox(0,0)[lb]{$\ket{x_j}$}}
+\put(9600,-5700){\makebox(0,0)[lb]{$\vdots$}}
+\put(900,-5700){\makebox(0,0)[lb]{$\vdots$}}
+\put(800,-6800){\makebox(0,0)[lb]{$\ket{x_0}$}}
+\put(9500,-6800){\makebox(0,0)[lb]{$\ket{x_0}$}}
+\put(800,-3166){\makebox(0,0)[lb]{$\ket{0^{j}}$}}
+\put(800,-1681){\makebox(0,0)[lb]{$\ket{0}$}}
+\end{picture}\vspace{2mm}
+\caption{QFT circuit in $O(\log n)$ depth due to Cleve and Watrous \cite{Cleve2000}.}
 \label{fig:qft-cw}
-\caption{The parallel QFT of Cleve and Watrous}
 \end{figure}
 
 Furthermore, each copy network for all $n$ bits $\ket{j_\ell}$ can be done
@@ -280,16 +400,17 @@ The circuit space is therefore $O(n^3\log\log(n/\epsilon)$. The size and
 error probability is
 the same as the AQFT.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{QFT Summary}
 
 Table \ref{tab:qft-summary} summarizes the circuit size, depth, width, space, and
 error probability for the QFT implementations discussed in this section.
 For the approximate circuits, we set $\epsilon = 1/O(n^2)$,
 since this is the per-gate error we would need to get a constant
-error probability for a QFT circuit on $n$ qubits with size $O(n^2)$.
+error probability for a QFT on $n$ qubits.
 
-\begin{center}
 \begin{figure*}
+\begin{center}
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
 \textbf{Author} & \textbf{Depth} & \textbf{Size} & \textbf{Width} & \textbf{Space} & \textbf{Error}\\
@@ -297,21 +418,19 @@ error probability for a QFT circuit on $n$ qubits with size $O(n^2)$.
 Shor & $O(n^2)$ & $O(n^2)$ & $O(n)$ & $O(n^3)$ & 0\\
 Coppersmith & $O(n\log n)$ & $O(n\log n)$ & $O(n)$ & $O(n^2\log n)$ & $1/O(n^2)$ \\
 Folklore & $O(n)$ & $O(n^2)$ & $O(n)$ & $O(n^2)$ & 0\\
-CW & $O(\log n)$ & $O(n^2)$ & $O(n^2)$ & $O(n^2 \log n)$ & 0\\
-CW & $O(\log \log n)$ & $O(n \log n)$ & $O(n^2)$ & $O(n^2 \log\log n)$ & $1/O(n^2)$\\
-BKP & $O(1)$ & $O(n^2)$ & $O(n^2)$ & $O(n^2)$ & 0\\
+Cleve-Watrous & $O(\log n)$ & $O(n^2)$ & $O(n^2)$ & $O(n^2 \log n)$ & 0\\
+Cleve-Watrous & $O(\log \log n)$ & $O(n \log n)$ & $O(n^2)$ & $O(n^2 \log\log n)$ & $1/O(n^2)$\\
+Browne-Kasheffi-Perdrix & $O(1)$ & $O(n^2)$ & $O(n^2)$ & $O(n^2)$ & 0\\
 \hline
 \end{tabular}
 \caption{Summary of circuit resources for different QFT implementations.}
 \label{tab:qft-summary}
-\end{figure*}
 \end{center}
+\end{figure*}
 
-Cleve and Watrous mention the open problem of computing an exact QFT in
-sub-logarithmic depth. However, this predates the constant-depth result of
-BKP, where the logarithmic-depth copy network can be replaced with a
-constant-depth unbounded fanout. Therefore, BKP answers their open
-question in the affirmative. BKP can also be used to implement an
+The result of Browne et al. \cite{Browne2009} replaces the copy network
+of Cleve and Watrous with a constant-depth unbounded fan-out.
+BKP can also be used to implement an
 AQFT with improved circuit space, but there is no further depth improvement
 possible. By introducing circuit space, we hope to provide another parameter
 for continuing to improve QFT circuits in the future that will affect

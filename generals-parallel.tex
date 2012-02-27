@@ -4,8 +4,8 @@
 Here we survey three powerful techniques behind a recent trend of work on
 constant-depth circuits. The first is the constant-depth unbounded fan-out.
 The second is the parallelization of
-commuting gates and the 	extsc{OR} reduction of H{\o}yer and {\v S}palek
-\cite{Hoyer2002}. This reduction gives us an approximate 	extsc{OR} gate,
+commuting gates and the \textsc{OR} reduction of H{\o}yer and {\v S}palek
+\cite{Hoyer2002}. This reduction gives us an approximate \textsc{OR} gate,
 which is made exact by Takahashi and Tani \cite{Takahashi2011} using the
 third technique, the analysis of boolean parity functions.
 
@@ -31,13 +31,13 @@ to $n$ target qubits in this manner according to Equation \ref{eqn:copy}.
 This can be done in logarithic depth with a cascade of CNOTs as shown
 in Figure \ref{fig:fanout}.
 
-\begin{center}
 \begin{figure}
+\begin{center}
 \includegraphics[width=3in]{figures/fanout.pdf}
 \caption{The equivalence of unbounded fan-out and parity gates on 3 qubits \cite{Hoyer2002}.}
 \label{fig:fanout}
-\end{figure}
 \end{center}
+\end{figure}
 
 Moore and Nilsson showed unbounded fan-out was equivalent in power to the parity gate
 \cite{Moore1998}, also via the example shown in Figure \ref{fig:fanout}.
@@ -70,7 +70,7 @@ a severe caveat in its use in physical implementations.
 \end{equation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Commuting Operator Parallelism and Approximate 	extsc{OR}}
+\subsection{Commuting Operator Parallelism and Approximate \textsc{OR}}
 
 Gates applied to different qubits can be applied at the same time. This is
 the classical definition of parallelism. However, there is an inherently
@@ -83,23 +83,23 @@ This second condition is the case for many
 functions needed in quantum algorithms, for example modular arithmetic
 \cite{Moore1998}, and the constant-depth rotation by Hamming weight shown
 in Figure \ref{fig:rotate-hamming}. This is the underlying technique to
-the approximate 	extsc{OR} circuit that we will now expose.
+the approximate \textsc{OR} circuit that we will now expose.
 
-\begin{center}
 \begin{figure}
-\label{fig:rotate-hamming}
-\includegraphics[width=3in]{figures/rotate-hamming.pdf}
+\begin{center}
+\includegraphics[width=2.5in]{figures/rotate-hamming.pdf}
 \caption{Constant-depth rotation by Hamming weight $|x|$ \cite{Hoyer2002}.}
-\end{figure}
+\label{fig:rotate-hamming}
 \end{center}
+\end{figure}
 
-We can define the 	extsc{OR} function on an $n$-bit string $x$ in terms of
+We can define the \textsc{OR} function on an $n$-bit string $x$ in terms of
 its Hamming weight
-$|x|$. Note that 	extsc{OR} is a classical function, but that we are using quantum
+$|x|$. Note that \textsc{OR} is a classical function, but that we are using quantum
 techniques to approximate it.
 
 \begin{equation}
-\textsc{	extsc{OR}}(x) =
+\textsc{OR}(x) =
 \begin{cases}
 0 & \text{if } |x| = 0\\
 1 & \text{if } |x| \ne 0
@@ -150,14 +150,14 @@ E[|Y|] =
 This is the reduction that we wanted in the beginning of this section, and
 we now recursively feed $\ket{y}$ into a circuit for $R_Z(2\pi|y|)$ to get
 the final result bit $\ket{z} = \ket{\mu_{\phi_1}^{|y|}}$, which is
-the approximate 	extsc{OR} of the original input $x$.
+the approximate \textsc{OR} of the original input $x$.
 The entire circuit shown in Figure \ref{fig:or-approx}.
 
 \begin{center}
 \begin{figure}
-\label{fig:or-approx}
 \includegraphics[width=3in]{figures/or-approx.pdf}
-\caption{	extsc{OR} approximation by parallel Hamming weight rotations \cite{Hoyer2002}.}
+\caption{\textsc{OR} approximation by parallel Hamming weight rotations \cite{Hoyer2002}.}
+\label{fig:or-approx}
 \end{figure}
 \end{center}
 
@@ -166,18 +166,18 @@ size $O(n^2 \log n)$, and width $O(n^2 \log n)$.
 %Its space is just the product of the width and depth, $O(n^2 \log n)$.
 
 As an interesting corollary,
-H{\o}yer and {\v S}palek also discovered an exact reduction to go from an 	extsc{OR} gate
-on $n$ bits to an 	extsc{OR} gate on $m=\lceil \log(n+1) \rceil$ bits, also in
+H{\o}yer and {\v S}palek also discovered an exact reduction to go from an \textsc{OR} gate
+on $n$ bits to an \textsc{OR} gate on $m=\lceil \log(n+1) \rceil$ bits, also in
 constant depth and with both size and width increasing as $O(n \log n)$.
-They use this \emph{	extsc{OR} reduction} to get constant-depth
+They use this \emph{\textsc{OR} reduction} to get constant-depth
 circuits for approximating the QFT, the exact gate $\textsc{EX}[t]$, the counting gate CO,
 the threshold gate $\textsc{TH}[t]$, and the majority gate $\textsc{MAJ}$.
 By recursively applying this reduction and related techniques, they
-get an $O\log^*{n}$ depth circuit for approximate 	extsc{OR},
+get an $O\log^*{n}$ depth circuit for approximate \textsc{OR},
 where $\log^*n$ is the iterated logarithm function and is essentially constant
 ($c < 6$ given the number of particles in the universe).
 
-%The essential concept between the 	extsc{OR} reduction is to reduce computing the
+%The essential concept between the \textsc{OR} reduction is to reduce computing the
 %	extsc{OR} of $n$ qubits to computing the 	extsc{OR} of $\log n$ qubits in constant depth.
 %Once this has been done, one can apply the reduction recursively to reduce
 %the 	extsc{OR} of $\log n$ qubits to the 	extsc{OR} of $\log \log n$ qubits, until we
@@ -185,17 +185,17 @@ where $\log^*n$ is the iterated logarithm function and is essentially constant
 %in the obvious way.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Parity Function Decomposition and Exact 	extsc{OR}}
+\subsection{Parity Function Decomposition and Exact \textsc{OR}}
 
 However, what cares the true theorist about the number of particles in the
 universe? This leaves
-a gaping open question whether we can get an \emph{exact} 	extsc{OR} circuit in truly
+a gaping open question whether we can get an \emph{exact} \textsc{OR} circuit in truly
 constant depth. Takahashi and Tani answered this question in the
 affirmative \cite{Takahashi2011}.
 This also resolves the relative statuses of
 three constant-depth circuit complexity classes. $\textsf{QNC}^0_f$ is the
 class of constant-depth circuits over single-qubit gates and CNOT.
-$\textsf{QAC}^0_f$ augments this set with an unbounded 	extsc{OR} gate.
+$\textsf{QAC}^0_f$ augments this set with an unbounded \textsc{OR} gate.
 $\textsf{QTC}^0_f$ augments this further with a threshold gate.
 
 \begin{equation}
@@ -209,14 +209,15 @@ Namely, $\textsf{NC}^0_f \subsetneq \textsf{AC}^0_f \subseteq \textsf{TC}^0_f$,
 and this gives us a further clue about the potential power of quantum
 versus classical computing.
 
-The exact 	extsc{OR} circuit consists of two stages. The first stage is the 	extsc{OR}
+The exact \textsc{OR} circuit consists of two stages. The first stage is the
+\textsc{OR}
 reduction of H{\o}yer and {\v S}palek from $n$ bits to $O(\log n)$ bits
 described in the previous section.
-The second stage is an exact 	extsc{OR} circuit which 
-decomposes of 	extsc{OR} into masked parity functions,
+The second stage is an exact \textsc{OR} circuit which 
+decomposes of \textsc{OR} into masked parity functions,
 similar to the Fourier analysis of Boolean functions \cite{ODonnell2008},
 which we show in Equation \ref{eqn:pa-decomp}.
-The exact 	extsc{OR} circuit takes as input $m$ bits and operates in
+The exact \textsc{OR} circuit takes as input $m$ bits and operates in
 $O(1)$ depth and with
 size and width both in $O(m\cdot2^m)$. This last figure is exponential in $m$,
 which is why it is necessary to perform the reduction in the first stage,
@@ -224,7 +225,7 @@ so that $m = O(\log n)$, and $O(\log n \cdot 2^{\log n}) = O(n \log n)$ still
 gives us polynomial size and width.
 
 \begin{equation}
-\textsc{	extsc{OR}}_n(x) = \frac{1}{2^{n-1}} \sum_{a\in {0,1}^n\ {0^n}} \textsc{PA}_n^a(x)
+\textsc{OR}_n(x) = \frac{1}{2^{n-1}} \sum_{a\in {0,1}^n\ {0^n}} \textsc{PA}_n^a(x)
 \label{eqn:pa-decomp}
 \end{equation}
 
@@ -238,21 +239,21 @@ the parity of the input $x$, as shown in Equation \ref{eqn:pa-defn}.
 
 These values of $\textsc{PA}_n^a(x)$ can be computed in constant depth and
 in parallel using
-the unbounded fan-out gate. An example of the exact 	extsc{OR} circuit 3 qubits is
+the unbounded fan-out gate. An example of the exact \textsc{OR} circuit 3 qubits is
 shown in Figure
 \ref{fig:or3}. Note that all groups of controlled operations can be applied
 in constant depth.
 
-\begin{center}
 \begin{figure}
-\includegraphics[width=3in]{figures/or-approx.pdf}
-\caption{The constant-depth exact 	extsc{OR} circuit on 3 qubits \cite{Takahashi2011}.}
+\begin{center}
+\includegraphics[width=3in]{figures/or3.pdf}
+\caption{The constant-depth exact \textsc{OR} circuit on 3 qubits \cite{Takahashi2011}.}
 \label{fig:or3}
-\end{figure}
 \end{center}
+\end{figure}
 
-While the improvement of $O(\log^*{n})$ depth in the approximate 	extsc{OR} case to
-$O(1)$ depth in the exact 	extsc{OR} case seems like a very small improvement,
+While the improvement of $O(\log^*{n})$ depth in the approximate \textsc{OR} case to
+$O(1)$ depth in the exact \textsc{OR} case seems like a very small improvement,
 the analysis of boolean functions and their decomposition into the
 basis of parity functions is a very general technique which could lead to
 low-depth circuits in the future, and possibly the discovery of another gate

@@ -40,11 +40,13 @@ good introduction to the field \cite{Lloyd1996}.
 %experimental feasibility, and its theoretical implications.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Hamiltonians for Computer Scientists}
+\subsection{Hamiltonians for \\ Computer Scientists}
 
 In a quantum mechanical system, observable quantities are eigenvalues
 associated with Hermitian matrices. A Hamiltonian is the operator associated
-with the energy of a system, which is a dual to time. Therefore, we know
+with the energy of a system, which is a dual to time, similarly to how
+position and momentum are duals in the famous Heisenberg uncertainty principle.
+Therefore, we know
 how a physical system evolves over time $t$ from its Hamiltonian $H$. For
 an $n$-qubit system, $H$ has size $2^n \times 2^n$.
 Starting from an initial state $\ket{\psi_0}$, we can simulate its time
@@ -57,7 +59,7 @@ equation.
 \ket{\psi_f} = e^{-iHt} \ket{\psi_0}
 \end{equation}
 
- base $e$? In analogy to 
+In analogy to 
 the Taylor expansion of the function $e^x$, which exponentiates a number,
 we can define the Taylor expansion of the matrix $e^{-iHt}$ which is itself
 a $2^n\times 2^n$ matrix.
@@ -68,23 +70,25 @@ e^{-iHt} = \sum_{j=0}^{\infty} \frac{(-iHt)^t}{j!}
 
 Since this is an infinite sum which converges to the true matrix
 $e^{-iHt}$, we can take only the initial $k$ terms to get an approximation
-which is accurate, neglecting lower-order $O(t^k)$ terms.
+which is accurate up to $O(t^k)$ terms.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{The Hamiltonian Simulation Problem}
+\subsection{The Simulation Procedure}
 
 To state the problem more formally, suppose that you have an initial
 quantum state $\ket{\psi_0}$ of $n$ qubits
 and you would like to evolve it according to a Hamiltonian $H$ for time
 $t$ to get
-a final state $\ket{\psi_f}$. This final state will have the same properties
-as the state of the system that you were originally trying to simulate. To
+a final state $\ket{\psi_f}$. You can then operate on this simulated final state
+to get some insight into the system defined by $H$, for example, by finding
+its ground state energy.
+To
 enact this simulation, we perform a unitary which is equivalent to the
 exponential $e^{-iHT}$.
 
-\begin{displaymath}
+\begin{equation}
 \ket{\psi_f} = e^{-iHT} \ket{\psi_0}
-\end{displaymath}
+\end{equation}
 
 However, $H$ (and therefore $U_H$)
 is an exponentially large matrix in the number of qubits you
@@ -98,11 +102,11 @@ exponentials of its decomposed terms $H_m$ over a small
 timestep $\delta$ as in Equation
 \ref{eqn:hamsim-ut}.
 
-\begin{equation}
-U_\delta = [e^{-iH_1 \delta}\cdot e^{-iH_2 \delta} \cdots e^{-iH_M \delta}]\cdot
-      [e^{-iH_M \delta}\cdot e^{-iH_{M-1} \delta} \cdots e^{-iH_1 \delta}]
+\begin{eqnarray}
+U_\delta & = & [e^{-iH_1 \delta}\cdot e^{-iH_2 \delta} \cdots e^{-iH_M \delta}]\cdot\\
+         &   & [e^{-iH_M \delta}\cdot e^{-iH_{M-1} \delta} \cdots e^{-iH_1 \delta}]
 \label{eqn:hamsim-ut}
-\end{equation}
+\end{eqnarray}
 
 Then Equation \ref{eqn:hamsim-trotter} bounds the error of approximation
 as a function of the simulation timestep $\delta$.
@@ -122,11 +126,14 @@ small timestep.
 \subsection{Possibilities for Parallelization}
 
 Berry et al. showed that if we restrict our Hamiltonian $H$ to be
-$d$-sparse, we can achieve a better bound for the total
-number of terms in our decomposition, namely $M=6d^2$ \cite{Berry2005}.
+$d$-sparse, we can achieve a bound for the total
+number of terms in our decomposition which is $M=6d^2$ \cite{Berry2005},
+an improvement over the previous results by Aharonov and Ta-Shma
+\cite{Aharonov2003}.
 Furthermore, they showed that sublinear simulation time was impossible.
 This gives indirect evidence that for a Hamiltonian of this form,
-there is no way to decompose it into terms that pairwise commute, since then
+there is no way to decompose it into terms whose exponentials
+pairwise commute, since then
 it would be possible to parallelize the simulation of the
 exponentials $e^{-iH_m t}$ using
 the technique of H{\o}yer and {\v S}palek in
@@ -138,3 +145,5 @@ discussion in \ref{subsec:compile}? In the decomposition above, each $H_m$
 was 1-sparse. An interesting open question is whether this structure of
 $H_m$ would allow us to optimize the two-level decomposition of
 Aho and Svore \cite{Aho2003}.
+
+Now the sun is coming up again, so it's time to wrap things up.

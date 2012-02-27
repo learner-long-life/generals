@@ -1,22 +1,28 @@
 \section{Fault-Tolerance}
 \label{sec:ft}
 
-Now we turn to the subject of fault-tolerance, one of the largest and most
+Now we touch briefly on the subject of fault-tolerance, one of the largest and most
 important areas of quantum computing. Since noise is the principal engineering
 difficulty in realizing a functioning quantum computer, it is natural to
 ask if it is possible, even in theory, to perform robust quantum computations
 in the presence of errors.
 
 Suppose that a single physical qubit has an error rate in the laboratory of
-$p$. That is, for a given unit of time (this is scaled arbitrarily),
-there is a probability $p$ that the
-qubit will experience a bit flip or a phase flip (modeled as an unintended
+$p$ for the unit of time it takes to perform an elementary gate
+(say, from $\mathcal{C}_1$). That is with probability $p$
+it will experience a bit flip or a phase flip (modeled as an unintended
 $X$ or $Z$ gate), and with the remaining probability $1-p$ it stays the same.
-More generally, we want to perform intentional gates on a qubit, and every gate
-we perform (assuming they all take a time step) is a potential point for an
-error to occur. If we have a quantum circuit with $S$ gates, and the errors
-are independent but identically distributed, and therefore accumulate
-linearly across the entire circuit. As is usually the case, we want our circuit
+Every gate
+we want to perform on the qubit, including the identity gate,
+introcues potential point for an
+error to occur. In the most common error model,
+we assume that all errors
+are single-qubit, independent, and identically distributed, and therefore accumulate
+linearly across the entire
+circuit. (This is, infact, the primary objection to large-scale quantum
+computing, as debated by Gil Kalai and Aram
+Harrow.\footnote{\url{http://rjlipton.wordpress.com/2012/01/30/perpetual-motion-of-the-21st-century/\#more-8030}})
+As is usually the case, we want our circuit
 to have some total error probability equal to some small constant, say
 $\epsilon = 1/4$. That way, we can repeat our circuit $4$ times, take the majority vote
 of the answers, and on average we will have a high probability of getting the
@@ -24,34 +30,37 @@ correct answer from our circuit. What then, is our desired per-gate error $p'$
 have to be? It is simply scaled by the size of the circuit, so
 $p' < \frac{\epsilon}{S}$. In general, $p' < p$, in that our desired
 error rate is less than (usually by several orders of magnitude) than our
-actual error rate. How do we drive down the error rate?
+actual error rate. How do we drive down the effective error rate below $p'$?
 
-To gain some perspective from classical computing, we can choose to protect
+
+%In general, we denote by a $[[n,k,d]]$ code one that
+%encodes $k$ logical qubits (usually 1) into $n$ physical qubits with a distance of
+%$d$, that is, the code words differ from each other in $d$ qubits. In that
+%setting, we can correct up to $r = \lfloor d/2 \rfloor$ physical qubit errors.
+%In the simplest codes, the minimum we can do is
+%protect against a single-qubit error $d=3$. That is, in our encoding, we can detect
+%a single-qubit error when it happens. The Steane code, one of the earliest
+%quantum codes, is classified as $[[7,1,3]]$, meaning that $1$ logical qubit
+%is encoded into $7$ physical qubits, and single-qubit errors can be detected
+%and corrected.
+%Within an encoded logical gate operation, let's say there are at most $c$
+%places where a single-qubit error can occur. Since these errors occur
+%independently, by the same argument we used above for an entire circuit,
+%the total single-qubit error probability of the encoded gate is $cp$.
+
+We can choose to protect
 our quantum information by encoding it cleverly somehow, so that
-errors that occur to the physical qubits (up to a certain point) do not
-affect the logical qubit. In general, we denote by a $[[n,k,d]]$ code one that
-encodes $k$ logical qubits (usually 1) into $n$ physical qubits with a distance of
-$d$, that is, the code words differ from each other in $d$ qubits. In that
-setting, we can correct up to $r = \lfloor d/2 \rfloor$ physical qubit errors.
-In the simplest codes, the minimum we can do is
-protect against a single-qubit error $d=3$. That is, in our encoding, we can detect
-a single-qubit error when it happens. The Steane code, one of the earliest
-quantum codes, is classified as $[[7,1,3]]$, meaning that $1$ logical qubit
-is encoded into $7$ physical qubits, and single-qubit errors can be detected
-and corrected.
-
-Within an encoded logical gate operation, let's say there are at most $c$
-places where a single-qubit error can occur. Since these errors occur
-independently, by the same argument we used above for an entire circuit,
-the total single-qubit error probability of the encoded gate is $cp$.
-
+errors (usually a single-qubit error)
+that occur to the physical qubits do not
+affect the logical qubit.
 Now, we have a different error probability, one that an undetectable error
 has occurred to our logical (encoded) qubit. The most likely such event is that
 two errors occurred. Remember that our base, single-qubit error rate was
 $p$, and for a given gate let's say there are $c$ different combinations of
 places for two errors to occur. The event of failure is now $cp^2$, since the
-event that two qubits fail simultaneously is independent. For the Steane
-code, $c=10^4$ \cite{Nielsen2000}.
+event that two qubits fail simultaneously is independent. For the
+popular Steane
+code, $c \approx 10^4$ \cite{Nielsen2000}.
 
 How can we drive down our error probability even farther?
 We can \emph{concatenate} error correcting-codes. This means
@@ -61,52 +70,54 @@ the base physical layer of qubits as Level 0, we can call the
 initial level of encoding Level 1, and then this second level of encoding
 as Level 2.
 
-%\begin{figure}
-%\caption{Insert figure of concatenated error correction}
-%\end{figure}
-
 What is the error probability in an encoded gate for the Level 2 block?
 Treating Level 1 qubits as basic units, there are still $c$ locations for
 pairs of errors to occur, but now the base error probability of gates for
 Level 1 is $cp^2$. So the error probability for a Level 2 gate is
 $c(cp^2)^2$.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Threshold Theorem}
+
 In general, we can concatenate error-correcting codes up to $k$ levels, and
-the per-gate error probability of a Level $k$ block is $p_k = c^{2^k-1}p^{2^k}$.
+we can choose $k$ to drive the per-gate error probability of a Level $k$ block
+to below some desired constant error $\epsilon$.
+
+\begin{equation}
+p_k = c^{2^k-1}p^{2^k} < \epsilon
+\end{equation}
+
 We've seen that $c$ can be quite large, so we need $p$ to be small enough
 so that this value decreases with increasing $k$. In order for this scheme
-to work
+to work $c(cp^2)^2 < 1$, or equivalently in Equation \ref{eqn:error-concat} 
 
-\begin{displaymath}
-c(cp^2)^2 < 1
-\end{displaymath}
-
-which means that the ... well I want to say something about how $p$ has
-to be initially smaller than $c$, or this whole scheme won't work.
-$c^3 p^4 < 1$, $p < \sqrt[4/3]{1/c}$.
-
-\subsection{Threshold Theorem}
+\begin{equation}
+p < \sqrt[4/3]{1/c}
+\label{eqn:error-concat}
+\end{equation}
 
 One of the most celebrated results of quantum computing is the threshold
 theorem, which states that if the individual error rates for qubit storage
-over time and operations are low enough (beneath a particular threshold),
+over time and operations are low enough (beneath a particular threshold $p_{th}$),
 then we can use multiple levels of concatenation to drive down the errors
 arbitrarily low, for example, to execute circuits of increasing size.
 
 \begin{displaymath}
-c^{2^k-1}p^{2^k} < p_th
+c^{2^k-1}p^{2^k} < p_{th}
 \end{displaymath}
 
 For the Steane code, depending on the particular architecture studied and
-other parameters, $p_th \approx 10^{-5} - 10^{-6}$.
-Error correction consumes vast resources. For the Steane code alone, without
+other parameters, $p_{th} \approx 10^{-5} - 10^{-6}$.
+
+Unfortunately, concatenated error correction consumes vast resources.
+For the Steane code alone, without
 taking into account nearest-neighbor or other architectural constraints, we
 would require thousands or even tens of thousands of qubits just to execute a
 circuit of a hundred gates. Therefore, people have looked for an alternative
 error-correcting scheme, one that has a higher threshold.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Stabilizer Formalism and Surface Code}
+\subsection{Stabilizer Formalism and the \\ Surface Code}
 
 Many error correcting codes can be studied in the \emph{stabilizer formalism},
 a very useful framework developed by Daniel Gottesman in his thesis
@@ -120,7 +131,7 @@ concepts interchangeably.
 In fact, in the Gottesman-Knill Theorem, it was found that a class of quantum
 operations could be simulated efficiently on a classical
 computer by keeping track of the system dynamics with respect to the
-stabilizer generators. This class corresponds to the Clifford group.
+stabilizer generators. This class corresponds to $\mathcal{C}_n$.
 
 In 1997, Kitaev proposed a radically different kind of error-correcting code,
 one based on the topology of logical qubits \cite{Fowler2009}.
@@ -140,8 +151,8 @@ the error probability.
 The surface code is closely related to the toric code but is appealing for
 practical implementation because it can be done realistically
 in 2D on a finite lattice, and it has a much higher threshold error rate
-than concatenated error-correcting schemes (approaching 1%).
-The surface code can also be expressed in the stabilizer formalism. Here there
+than concatenated error-correcting schemes (approaching $1\%$).
+The surface code can also be expressed in the stabilizer formalism. There
 are two types of stabilizer generators, the $X$ type, which are also called
 star operators because they involve $X$ operators on the $4$ qubits around a 
 vertex, and the $Z$ type, which are also called plaquette operators, which
@@ -161,6 +172,7 @@ section.
 %excitations (anyons) directly to implement qubits. Cite a bunch of papers
 %by Station Q, as well as the original proposal by Kitaev.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Parallelism}
 
 It is now the point to mention the close relationship between error correction,

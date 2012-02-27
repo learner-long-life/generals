@@ -7,21 +7,23 @@ using uninitialized quantum states, and architecture.
 This idea is the \emph{magic state}.
 
 In 2004, Bravyi and Kitaev proposed an interesting model of computation where
-we assume we are able to perform the following set of operations $O$
-perfectly: all the Clifford group operations,
-prepare fiducial state $\ket{0}$, perform Pauli measurements, but in
-addition we are given multiple copies of some mixed state $\rho$
+we assume we are able to perform the following set of operations
+perfectly: all $\mathcal{C}_n$,
+preparation of fiducial state $\ket{0}$, and Pauli measurements; but in
+addition, we are given multiple copies of some mixed state $\rho$
 \cite{Bravyi2004}. This last
 is a parameter of our model. Under what conditions of $\rho$ are we still
-able to do universal quantum computation (\textsc{UQC})? It turns out that
+able to do \textsc{UQC}? It turns out that
 if $\rho$ is a pure state corresponding to the eigenstates of the Hadamard
-($H$) operator or the $T$ operator, as defined below, then combined with the
+($H$) operator or the $T$ operator (defined in Equation \ref{eqn:T}
+then combined with the
 above operations we are able to perform \textsc{UQC}. Note that the
-$T$ operator here is \emph{not} the same as $R_Z{\pi/8}$ defined in
+$T$ operator here is \emph{not} the same as $R_Z(\pi/8)$ defined in
 \ref{subsec:universal} that is
 often called $T$ in the literature, for example in \cite{Nielsen2000}.
 
 \begin{equation}
+\label{eqn:T}
 T = e^{i\pi / 4} KH = \frac{e^{i\pi/4}}{\sqrt{2}}
 \left[ \begin{array}{cc}
 1 & 1\\
@@ -30,28 +32,27 @@ i & -i
 \end{equation}
 
 We denote by $\ket{H}$ and $\ket{T}$ the $+1$ eigenstates of $H$ and $T$
-respectively. By the Clifford group operations, there are eight symmetric
-magic states to $\ket{H}$ and twelve symmetric magic states to $\ket{T}$,
-or $20$ magic states total. We will therefore distinguish between
-magic states in the $\ket{H}$ direction, which can be identified as vectors
-which go from the origin of the Bloch sphere to bisect the edges of the
-Clifford octahedron, and magic states in the $\ket{T}$ direction, which
-go through the centers of the faces of the Clifford octahedron.
+respectively, which are defined in Equations \ref{eqn:ket-H} and \ref{eqn:ket-T}.
+In the next section, we will see a useful geometric
+interpretation of these states.
 
-\begin{equation}
-\ket{T} = \cos(\theta) \ket{0} + e^{i\pi / 4}\sin(\theta) \ket{1} \qquad
+\begin{eqnarray}
+\ket{T} = \cos(\theta) \ket{0} + e^{i\pi / 4}\sin(\theta) \ket{1} \\
+\label{eqn:ket-T}
 \cos(2\theta) = \frac{1}{\sqrt{3}}
-\end{equation}
+\end{eqnarray}
 
 \begin{equation}
 \ket{H} = \ket{0} + e^{i\pi/4} \ket{1}
+\label{eqn:ket-H}
 \end{equation}
 
 The use of the word ``magic state'' in the error-correcting literature,
 particularly for topological quantum computing, often refers to $\ket{H}$,
-because it is useful for enacting the $R_Z(\pi/8)$ gate fault-tolerantly,
+because it is convenient for enacting the $R_Z(\pi/8)$ gate fault-tolerantly,
 for most error-correcting codes which are able to do
 the Clifford gates fault-tolerantly (and transversally).
+However, both $\ket{H}$ and $\ket{T}$ are magical for \textsc{UQC}.
 %A circuit for doing this in the Steane code is shown in Figure \ref{fig:steane-pi8}.
 
 %%%%%%%%%%
@@ -64,11 +65,12 @@ the Clifford gates fault-tolerantly (and transversally).
 %\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Bloch Sphere}
+\subsection{Mixed States and the\\ Bloch Ball}
 
-We now return to the picture of the Bloch sphere from a previous section.
-Whereas before we only considered pure states, those whose preparation could
-be described in a deterministic way, this is not the most general definition
+The Bloch sphere is a useful geometric representation for visualizing
+a single qubit pure state and the homormorphism between $SO(3)$ and $SU(2)$.
+Pure states are those whose preparation can
+be described in a deterministic way. But this is not the most general definition
 of a quantum state. In general, we may not know how a state was prepared,
 either because a random error has occurred, or an adversary has tampered
 maliciously with it, or because the original experimentalist who prepared
@@ -83,15 +85,16 @@ the framework generalizes naturally to multi-qubit states.
 Although we
 will not delve deeply into the properties of density matrices here, they are
 a tool especially well-suited to expressing quantum states which are part
-of a larger system which may be unknown. Here is where philosophers or
-physicists who work in the foundations of quantum mechanics argue about whether
-quantum states represent objective states of nature or simply our beliefs about
-these states and the imperfect information we have about them. We will leave
-that debate to them.
+of a larger system which may be unknown.
+%Here is where philosophers or
+%physicists who work in the foundations of quantum mechanics argue about whether
+%quantum states represent objective states of nature or simply our beliefs about
+%these states and the imperfect information we have about them. We will leave
+%that debate to them.
 
-\begin{displaymath}
+\begin{equation}
 \rho = \sum_{j} p_j \ket{\psi_j}\bra{\psi_j}
-\end{displaymath}
+\end{equation}
 
 Here the probabilities $p_j$ should sum to $1$ to be a true probability
 distribution. This is also how a mixed quantum state can be viewed as a
@@ -114,12 +117,10 @@ The values $(p_x, p_y, p_z)$ is known as the \emph{polarization vector} of
 the mixed state and corresponds to its geometric three-dimensional coordinates
 within the Bloch sphere (now properly considered a Bloch ball, since mixed
 states can occupy the interior of the ball's volume). The real numbers
-$p_x$, $p_y$, and $p_z$ lie in the range $[-1,1]$.
-
+$p_x$, $p_y$, and $p_z$ lie in the range $[-1,1]$, and to restrict ourselves
+to valid quantum states we impose $|p_x| + |p_y| + |p_z| \le 1$.
 Mixed states include the pure states as a special case, that is, all the
-points that lie on the Bloch sphere surface. To restrict mixed states
-to those points which lie within the Bloch ball, including the surface,
-we impose $|p_x| + |p_y| + |p_z| \le 1$.
+points that lie on the Bloch sphere surface.
 
 %We can also describe the
 %correspondence between the polarization vector and our conventional
@@ -128,36 +129,53 @@ we impose $|p_x| + |p_y| + |p_z| \le 1$.
 %\begin{equation}
 %\end{equation}
 
-It turns out, by using the stabilizer framework (note here that stabilizer
-framework should come before this section) and the Gottesman-Knill theorem,
+It turns out, by using the stabilizer framework and the Gottesman-Knill Theorem,
 we can classically simulate all the states within the interior of an
 \emph{octahedron}, which we will call $\mathcal{O}$, which is defined as the
 convex hull of the six points corresponding to the eigenstates of the
 $X$, $Y$, and $Z$ operators.
-This is shown in Figure \ref{fig:clifford-octahedron}.
-These therefore known as stabilizer states, and we will sometimes refer to
-$\mathcal{O}$ as the Clifford octahedron because all of these states can be
-reached using the operations in $O$, which include the $\mathcal{C}_1$.
-Note to self, this section should come after the section explaining the
-Clifford group. It is therefore not surprising, although still somewhat
+These therefore known as stabilizer states.
+%, and we will sometimes refer to
+%$\mathcal{O}$ as the Clifford octahedron because all of these states can be
+%reached using the operations in $O$, which include the $\mathcal{C}_1$.
+%Note to self, this section should come after the section explaining the
+%Clifford group.
+It is therefore not surprising, although still somewhat
 mysterious, that the 24 elements of the $\mathcal{C}_1$ correspond
-exactly to the symmetries of the octahedron. (I think this is $S_4$, this
-could use some fact-checking love).
+exactly to the symmetries of the octahedron.
+
+By operations from $\mathcal{C}_1$, there are eight symmetric
+magic states to $\ket{H}$ and twelve symmetric magic states to $\ket{T}$,
+or $20$ magic states total. We will therefore distinguish between
+magic states in the $\ket{H}$ direction, which can be identified as vectors
+which go from the origin of the Bloch sphere to bisect the edges of
+$\mathcal{O}$, and magic states in the $\ket{T}$ direction, which
+go through the centers of the faces of the $\mathcal{O}$.
+
+The octahedron $\mathcal{O}$ is shown superimposed within the Bloch ball
+along with two representative magic states of the $\ket{H}$-type and
+$\ket{T}$-type in Figure \ref{fig:clifford-octahedron}.
+%(I think this is $S_4$, this
+%could use some fact-checking love).
 
 \begin{figure}
-\includegraphics[width=3in]{figures/blochsphere.pdf}
+\begin{center}
+\includegraphics[width=2in]{figures/blochsphere.pdf}
 \caption{The Bloch sphere with octahedron $\mathcal{O}$ and the magic states
 $\ket{T}$ and $\ket{H}$.}
 \label{fig:clifford-octahedron}
+\end{center}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Error Decoding}
 
 The process of magic state distillation is actually just
-concatenated error decoding, where the decoder we use determines how many
-copies of the state $\rho$ we need and what polarization threshold we can
-tolerate and still get a magic state. For example, in Bravyi and 
+concatenated error decoding. Just like in fault-tolerance, there is
+a threshold here for the polarization of the random states $\rho$ that we
+can tolerate and still distill out a magic state. This threshold depends
+on the particular decoder that we use, which also determines the number
+of copies of $\rho$ that we need. For example, in Bravyi and 
 Kitaev's original paper \cite{Bravyi2004} they used the well-known 5-qubit
 code to distill from five copies of $\rho$ in the $\ket{T}$ direction.
 The resulting threshold condition is that all $\rho$ that lies beyond the plane
@@ -169,10 +187,12 @@ In that scenario, we prepare our $\rho$ ``noisily'' by
 randomly applying the unitary $T$ with probability $p$.
 Then each $\rho$ is a mixture of the $e^{2\pi i / 3}$ and
 $e^{-2\pi i / 3}$ eigenstates of $T$ with probabilities $(1-p)$ and $p$.
-Just like with the fault-tolerant
+As with the fault-tolerant
 threshold theorem, every application of magic state distillation for a
 sufficiently small $p$ will result in an output state $\rho$ that is closer
-to $\ket{T}$, that is, $p_{out} < p$, according to Equation
+a magic state, that is, $p_{out} < p$. For the 5-qubit code example,
+distillation moves a state
+closer to $\ket{T}$ , according to Equation
 \ref{eqn:p_out}.
 
 \begin{equation}
@@ -182,10 +202,11 @@ p_{out} = \frac{t^5 + 5t^2}{1 + 5t^2 + 5t^3 + t^5} \qquad t \equiv \frac{p}{1-p}
 
 This threshold then divides up the Bloch ball into regions which can eventually
 be distilled to a magic state, either in the $\ket{H}$-direction or the
-$\ket{T}$-direction, and those which cannot. A threshold is \emph{tight}
+$\ket{T}$-direction, those which cannot, and those whose distillability is unknown.
+A threshold is \emph{tight}
 if it exactly defines a surface inside which $\rho$ cannot be distilled to
 a magic state and is also classically-simulatable. Definitely
-we know that states within the Clifford octahedron $\mathcal{O}$ belong to this
+we know that states within the $\mathcal{O}$ belong to this
 latter category, and that the points on the sphere corresponding to
 $\ket{H}$ and $\ket{T}$ have unquestionable magicness.
 

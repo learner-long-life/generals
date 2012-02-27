@@ -2,25 +2,30 @@
 \label{sec:factor}
 
 Shor's factoring algorithm in 1994 was the first and most famous example of an
-exponential speedup of quantum computers over classical computers.
-\cite{Shor1994}, although like the QFT, it is beginning to show its age.
+exponential speedup of quantum computers over classical computers
+\cite{Shor1994}. However, like the QFT, it is beginning to show its age.
+The real problem now becomes remaining excited about prime factorization,
+which Gauss exhorted us to solve those long centuries ago.
+
 Although we study this problem in greater depth in a separate work
 \cite{Pham2012b}, we mention here some interesting techniques introduced
 specifically for factoring but which may have wider applications.
 
-\subsection{Uninitialized Qubits and Approximate Algorithms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Uninitialized Qubits and\\ Approximate Algorithms}
 
 Parker and Plenio \cite{Parker2000} discovered that Shor's factoring algorithm
 could still have a low error probability even if $n$ of the $2n$ ancillae qubits
 were unitialized. That is, they introduced two important notions: approximate
 algorithms and unitialized qubits.
-An \emph{approximate algorithm} as one which succeeds for a certain fraction of
-its ancillary inputs, which is determined by the structure of the algorithm.
+An \emph{approximate algorithm} is one which succeeds for a certain fraction of
+its ancillary inputs, if all initial values are possible with uniform probability.
+The success probability is determined by the structure of the algorithm.
 For the example of factoring, the algorithm will fail if the ancillae
 register for modular multiplication starts out in a state $\ket{\alpha}$
 where $\alpha$ is a number that is not coprime with the modulus to be factored,
 $m$. If $m$ is truly prime, then all $\alpha$ will be corprime to it, but
-if $m$ is not a smooth number (that is, if $m$ is a product of many prime
+if $m$ is not a \emph{smooth number} (that is, if $m$ is a product of many prime
 factors) then a significant fraction of initial values $\ket{\alpha}$ will
 cause the algorithm to fail.
 
@@ -28,8 +33,9 @@ Zalka further improved this result so that none of
 the ancillae need be initialized \cite{Zalka2006}, although at the cost of
 a more complicated modular multiplication algorithm.
 To overcome adversarial inputs,
-he recommends randomizing the ancillae by randomly applying Pauli operators
-to the ancillae before beginning the algorithm.
+he rrandomizes the ancillae
+%by randomly applying Pauli operators to the ancillae%
+before beginning the algorithm.
 However, both the Zalka and Parker-Plenio result assume the ancillae qubits
 can be in a superposition of computational basis states, but are otherwise
 pure states in that they are not entangled with the environment or any other
@@ -46,7 +52,8 @@ contrast to circuit size, width, and depth, it is advantageous for
 an architecture or algorithm
 to allow more uninitialized qubits rather than fewer.
 
-\subsection{Approximate Modular Multiplication}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Approximate Modular\\ Multiplication}
 
 Zalka also studied an earlier idea of approximation in factoring, namely
 approximate modular multiplication \cite{Zalka1998}.
@@ -61,10 +68,12 @@ $b = \sum_{i} 2^ib_i$. Each
 modular multiplication must compute the $n$-bit modular product
 $r$ as in Equation \ref{eqn:modmult-r}.
 
-\begin{equation}
-r \equiv abc \equiv \sum_{i} 2^i a b_i c_j \equiv \sum_{i} (b_i c_j)(2^i a^{2^j} \bmod m) \bmod m
+\begin{eqnarray}
+r & \equiv & abc \\
+  & \equiv & \sum_{i} 2^i a b_i c_j \\
+  & \equiv & \sum_{i} (b_i c_j)(2^i a^{2^j} \bmod m) \bmod m
 \label{eqn:modmult-r}
-\end{equation}
+\end{eqnarray}
 
 This involves adding $2n$ classically precomputed numbers
 $(2^i a^{2^j} \bmod m)$ which are controlled on a bit $c_j$
@@ -77,10 +86,11 @@ $x_i$. However,
 the modular reduction part is the most resource-intensive, that is,
 determining $q$ and them subtracting $qm$ from $s$ to get $r$.
 
-\begin{equation}
-s = \sum_i b_i c_j (2^i a^{2^j} \bmod m) = \sum_i y_i x_i = r + qm
+\begin{eqnarray}
+s & = & \sum_i b_i c_j (2^i a^{2^j} \bmod m) \\
+  & = & \sum_i y_i x_i = r + qm
 \label{eqn:modmult-s}
-\end{equation}
+\end{eqnarray}
 
 Note that $q$ can be encoded in $\lceil \log_2 n \rceil$ bits, and we can
 express it as a sum followed by a division as in Equation \ref{eqn:modmult-q}.
@@ -93,7 +103,7 @@ q = \lfloor ( \sum_{i} y_i x_i ) / m \rfloor
 In general, if we wanted to obtain $q$ by the division $\lfloor s/m \rfloor$,
 we would perform $\lceil \log_2 n \rceil$ trial subtractions of the
 $n$-bit numbers $2^{k-1} m$ to determine the
-bits $q_k$, for $k \in {1, \ldots, n}$. However, in the transform adder,
+bits $q_k$, for $k \in \{1, \ldots, n\}$. However, in the transform adder,
 we would have to change into and out of the Fourier basis every time to
 compare the value of the high bit $q_k$ to see if we underflowed the register
 or not. This would normally take depth $O(n^2)$.
@@ -107,7 +117,7 @@ $\log_2 n$-bit numbers, and we can compute $\hat{q}$ in depth $O(\log^2 n)$.
 What is the error in this approximation? With probability $2^{-\ell}$,
 $\hat{q} \ne q$. If we set $\ell = 2\log_2 n$, we get a constant error
 probability. The intuitive idea of this is that for some values of
-$a \in \mathbb{Z_m}$, the lower $n - \ell$ bits of $x_i$ add up to more than
+$a \in \mathbb{Z}_m$, the lower $n - \ell$ bits of $x_i$ add up to more than
 $m$ and cause $\hat{q}$ to be greater than $q$. We know which values of $a$
 will cause a problem in advance, but we must also choose $a$ randomly for
 quantum period-finding to succeed in factoring.
