@@ -10,76 +10,68 @@ which are inspired by processing digital information, exhibit great speedups,
 they are also far out of reach of today's experimental capabilities. To
 factor a 4096-bit key in the most conservative implementation, with only
 one layer of error-correction, would still take tens of thousands of qubits.
-In contrast, the problem of simulating a quantum Hamiltonian of 40 particles
+In contrast, the problem of simulating the time evolution of a quantum system of 40 particles
 is within the reach of experiments within the next decade and already
 far surpasses the abilities of all but the most powerful classical supercomputers
-today.
+today. A seminal work by Lloyd on universal quantum simulation still provides a
+good introduction to the field \cite{Lloyd1996}.
 
-Simulation itself is not exactly the same as computation. It
-plays a complementary role to digital computing, much like the
-now-defunct field of analog computing and other analog simulations. Instead
-of digitizing variables and representing them indirectly in binary
-encodings, abstracting away all physical effects, simulations encode variables
-in other analog variables, where the physical state of the analog model
-corresponds in some human-readable way to the simulated state of the
-original variable.
+%Simulation itself is not exactly the same as computation. It
+%plays a complementary role to digital computing, much like the
+%now-defunct field of analog computing and other analog simulations. Instead
+%of digitizing variables and representing them indirectly in binary
+%encodings, abstracting away all physical effects, simulations encode variables
+%in other analog variables, where the physical state of the analog model
+%corresponds in some human-readable way to the simulated state of the
+%original variable.
 
-Simulation Hamiltonians also has theoretical interest in that there are some
-quantum physical systems which we can describe in a model
-but can't even simulate quantum mechanical [need citation]. In that case,
-there is an interesting twist in our expectations for a mathematical
-to be \emph{predictive}. Furthermore, due to the "no fast-forwarding" theorem,
-it turns out that even in a quantum simulation, we can't speed up time:
-simulating a many-body quantum system for time $t$ still takes time
-super-linear in $t$, although we can make it arbitrarily close to
-linear \cite{Berry2005}.
+%Simulation Hamiltonians also has theoretical interest in that there are some
+%quantum physical systems which we can describe in a model
+%but can't even simulate quantum mechanical [need citation]. In that case,
+%there is an interesting twist in our expectations for a mathematical
+%to be \emph{predictive}. Furthermore, due to the "no fast-forwarding" theorem,
+%it turns out that even in a quantum simulation, we can't speed up time:
+%simulating a many-body quantum system for time $t$ still takes time
+%super-linear in $t$, although we can make it arbitrarily close to
+%linear \cite{Berry2005}.
 
-Therefore, Hamiltonian simulation remains an interesting problem from the
-time of Feynman until today, both for its practical applications, its
-experimental feasibility, and its theoretical implications.
+%Therefore, Hamiltonian simulation remains an interesting problem from the
+%time of Feynman until today, both for its practical applications, its
+%experimental feasibility, and its theoretical implications.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Hamiltonians for Computer Scientists}
 
-But what, you may be thinking to yourself, is a Hamiltonian?
-In a quantum mechanical system, there are quantities which can be observed
-by humans which are represented by Hermitian matrices. A Hermitian matrix
-$H$ is self-adjoint, that is, $H=H^\dagger$, where $H^\dagger$ is the
-conjugate transpose of $H$. Specifically, let $H_{r,c}$ denote the matrix
-entry of $H$ in row $r$ and column $c$. Then the following holds:
+In a quantum mechanical system, observable quantities are eigenvalues
+associated with Hermitian matrices. A Hamiltonian is the operator associated
+with the energy of a system, which is a dual to time. Therefore, we know
+how a physical system evolves over time $t$ from its Hamiltonian $H$. For
+an $n$-qubit system, $H$ has size $2^n \times 2^n$.
+Starting from an initial state $\ket{\psi_0}$, we can simulate its time
+evolution with the unitary operator which is the
+matrix exponential of $H$ scaled by $t$, resulting in a final state $\ket{\psi_f}$.
+The form of this matrix exponential is due to solutions of the Schrodinger
+equation.
 
 \begin{equation}
-H_{r,c} = H^*_{c,r}
+\ket{\psi_f} = e^{-iHt} \ket{\psi_0}
 \end{equation}
 
-However, Hermitian matrices are not in general unitary, and we know that
-quantum systems evolve according to unitary operations. It turns out that
-we can say a quantum state evolves according to a certain Hamiltonian $H$ for
-a time $t$, meaning that it behaves in a certain way when placed in a system
-where the energy is described by $H$. This behavior is described by a unitary
-$U$
-which is the Hamiltonian raised to an exponent. The exact reason for this,
-and the appearance of the term $-i$, where $i = \sqrt{-1}$, has to do with
-solutions to the Schrodinger equation and deeper underlying formalisms of
-quantum mechanics, which we will not go into here.
-
-\begin{displaymath}
-U_H = e^{-iHt}
-\end{displaymath}
-
-What does it mean to exponentiate a matrix with the base $e$? In analogy to 
+ base $e$? In analogy to 
 the Taylor expansion of the function $e^x$, which exponentiates a number,
 we can define the Taylor expansion of the matrix $e^{-iHt}$ which is itself
 a $2^n\times 2^n$ matrix.
 
-\begin{displaymath}
+\begin{equation}
 e^{-iHt} = \sum_{j=0}^{\infty} \frac{(-iHt)^t}{j!}
-\end{displaymath}
+\end{equation}
 
 Since this is an infinite sum which converges to the true matrix
 $e^{-iHt}$, we can take only the initial $k$ terms to get an approximation
 which is accurate, neglecting lower-order $O(t^k)$ terms.
 
-\subsection{Problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Hamiltonian Simulation Problem}
 
 To state the problem more formally, suppose that you have an initial
 quantum state $\ket{\psi_0}$ of $n$ qubits
@@ -98,4 +90,51 @@ However, $H$ (and therefore $U_H$)
 is an exponentially large matrix in the number of qubits you
 are trying to simulate. If you were to generically compile $U_H$, 
 
-In \cite{Berry2005} we 
+We use the following variant of the Trotter formula \cite{Aharonov2003}.
+Let $H = \sum_{m=1}^M H_m$ be the Hamiltonian we are trying to simulate, where
+each $H_m$ is Hermitian and all have bounded norm, $||H||,||H_m|| \le \Lambda$.
+Define an approximation to the time evolution of $H$ over time $t$ by using the
+exponentials of its decomposed terms $H_m$ over a small
+timestep $\delta$ as in Equation
+\ref{eqn:hamsim-ut}.
+
+\begin{equation}
+U_\delta = [e^{-iH_1 \delta}\cdot e^{-iH_2 \delta} \cdots e^{-iH_M \delta}]\cdot
+      [e^{-iH_M \delta}\cdot e^{-iH_{M-1} \delta} \cdots e^{-iH_1 \delta}]
+\label{eqn:hamsim-ut}
+\end{equation}
+
+Then Equation \ref{eqn:hamsim-trotter} bounds the error of approximation
+as a function of the simulation timestep $\delta$.
+
+\begin{equation}
+||U_{\delta}^{\lfloor \frac{t}{2\delta} \rfloor} - e^{-iHt}||
+\le O(M\cdot\Lambda \cdot \delta + M\Lambda^3 t \delta^2)
+\label{eqn:hamsim-trotter}
+\end{equation}
+
+For fixed total evolution time $t$, Hamiltonian term count $M$,
+and norm bound $\Lambda$, we can decrease the error arbitrarily as
+$\delta$ goes to zero. In practice, we can make $\delta$ a polynomially
+small timestep.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Possibilities for Parallelization}
+
+Berry et al. showed that if we restrict our Hamiltonian $H$ to be
+$d$-sparse, we can achieve a better bound for the total
+number of terms in our decomposition, namely $M=6d^2$ \cite{Berry2005}.
+Furthermore, they showed that sublinear simulation time was impossible.
+This gives indirect evidence that for a Hamiltonian of this form,
+there is no way to decompose it into terms that pairwise commute, since then
+it would be possible to parallelize the simulation of the
+exponentials $e^{-iH_m t}$ using
+the technique of H{\o}yer and {\v S}palek in
+Section \ref{sec:parallel}.
+
+Since we cannot parallelize the application of the exponentials themselves,
+what about optimizing the depth of their compilations, following our
+discussion in \ref{subsec:compile}? In the decomposition above, each $H_m$
+was 1-sparse. An interesting open question is whether this structure of
+$H_m$ would allow us to optimize the two-level decomposition of
+Aho and Svore \cite{Aho2003}.

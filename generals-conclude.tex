@@ -1,3 +1,74 @@
-\section{Conclusion}
+\section{Conclusion and Future Directions}
+\label{sec:conclude}
 
-Finally, I thought we'd never get here$\ldots$
+In our exploration of low-depth quantum architectures, we have found
+close connections with compilation,
+error-correction procedures, parallel classical
+control, approximative algorithms, uninitialize qubits, magic state
+distillation, and Hamiltonian simulation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Uncomputing Ancillae}
+
+Now that depth optimizations have bottomed out in the constant-depth case,
+we can turn to optimizing for constant-size circuits or even numerically
+optimizing all the circuit resources, especially circuit space.
+This optimization may take the form of Bennett's intermediate uncomputing
+techniques for reversible circuits \cite{Bennett1973},
+which has already been used to convert any out-of-place, possibly irreversible,
+function to an in-place, reversible one, possibly with garbage bits. In
+particular the 2D factoring architecture of Ref. \cite{Pham2012b} has
+depth $O(\log^2 n)$ but width $O(n^4)$ in the worst case due to the garbage
+bits produced by the constant-depth addition, giving a circuit space of
+$O(n^4 \log^2 n)$. This is quite an onerous burden
+to maintain througout the entire circuit, especially since the majority of
+these garbage bits are produced at the beginning, close to the inputs.
+Since the circuit has polylogarithmic depth, we could uncompute ancillae back
+towards the inputs and then recompute them back to the ``edge'' of the current computation
+state in several waves, each successively close to the output qubits
+like the waves of the ocean on a beach during a rising tide.
+The circuit size of the current
+implementation is $O(n^3)$, so there is some room for improvement.
+Although this may not lead to an asymptotic improvement in circuit space,
+the calculation of exact numerical resources in this new model may be of
+great practical importance in near-future experiments.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modular Computation States}
+
+On the note of large monolithic computation states, it may be preferrable
+to compute a circuit in separate modules and keep them unentangled as long
+as possible. By preparing multiple identical modules in parallel, if any
+of them fail error detection and correction, it may be discarded and an
+equivalent module chosen to take its place. This is reminiscent of
+Knill's post-selection scheme \cite{Knill2004}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{A Quantitative Theory of Magic}
+
+Another interesting direction to pursue is in the distillation of magic
+states. 
+Wim van Dam has proposed an interesting idea about the interconversion of
+magic states to non-magic states. Namely, the following relationship is
+conjectured to hold.
+
+\begin{equation}
+\ket{H}^{\otimes n} \rightarrow \rho^{\otimes (c_1 + o(1))n}
+\end{equation}
+
+\begin{equation}
+\rho^{\otimes n} \rightarrow \ket{H}^{\otimes (c_2 + o(1))n}
+\end{equation}
+
+We would like to determine if this relationship is valid and if so,
+what is the relationshiop between the constants $c_1$
+and $c_2$ and for what parameters of $\rho$. This may take inspiration
+from the interconversion of different entangled resources in the LOCC
+setting \cite{Ambainis2002}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Farewell}
+
+Although many circuits of interest have already been reduced to constant-depth,
+which is the lowest depth there is, we hope that the proposed directions above
+provide further avenues for interesting work.

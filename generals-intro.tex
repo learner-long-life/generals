@@ -6,133 +6,45 @@ physically possible in our universe, redefining a computing machine as
 making use of the full power of our most realistic theory of physics
 at a small scale, quantum mechanics. However, great engineering challenges
 currently stand between us and a fully working quantum computer, mostly
-related to error correction, fault-tolerance, and maintaining delicate
-control over microscopic systems while still interacting with them for
-preparation and readout.
+related to fault-tolerance and scalability.
 
-Some people have chosen to work on a more restrictive problem using
-the quantum computing model of adiabatic optimization (cite D-Wave paper here).
 The original and most popular model of universal quantum computing is the
 quantum circuit model, which is what we examine in this report.
 Quantum circuits, like their classical counterpart, consist of gates
-whose inputs and outputs are connected to construct larger structures,
-such that feeding in inputs in one end will give us our desired outputs at
-the other end. In this case, however, the circuits are reversible.
+with outputs which can be fed into the inputs of other gates
+to construct larger circuits, with the restriction that these gates be
+reversible and unitary.
 
-Something about compiling also here, and references to
-\cite{Pham2012a}. We define here quantum architecture as the physical
-layout of qubits and their interactions in order to run quantum algorithms
-while minimizing circuit resources \cite{VanMeter2006}, \cite{Pham2012b}.
-
-
-In this report, we study an emerging trend in quantum circuit construction
-research, that of low-depth quantum architectures, and we use it to unite
+In this report, we study an emerging trend in quantum architecture
+research, that of low-depth quantum circuits, and we use it to unite
 the important themes of classical control, parallelism, fault-tolerance,
-and circuit resources. In doing so, we define several new resources to
-augment the existing circuit model, namely \emph{circuit space}, its
-combination with \emph{success probability}, and the use of
-\emph{unitialized qubits}. Our approach is one of pragmatism with an
+and circuit resources. Our approach is one of pragmatism with an
 eye towards a new generation of quantum computer architects and engineers
 working closely with both experimental physicsts and theorists to translate
-algorithms onto running hardware.
+algorithms onto running hardware. We use mathematical formalism where we
+think it is illustrative, but we will not get stuck on rigorous proofs here.
+Quantum computers are like the cathedrals of the 21st century, and their
+architects may not live long enough to see their designs get built unless
+we make these problems accessible to as many builders and thinkers as possible.
 
 Here then is the organization of our report.
-In Section \ref{sec:circuit} we define the quantum circuit model and the
-resources that are measured and minimized in quantum architecture. In
-Section \ref{sec:qft} we apply this circuit model to the development of
+In Section \ref{sec:circuit}, we define the quantum circuit model and the
+resources that are measured and minimized in quantum architecture.
+In Section \ref{sec:parallel}, we survey some recent
+parallelization techniques
+behind the recent push towards constant-depth circuits.
+In Section \ref{sec:qft}, we apply this circuit model to the development of
 a core building block, the quantum Fourier transform, and follow its
-various optimizations over the years. In Section \ref{sec:factor} we
-discuss the celebrated problem of factoring integers with a view to our new
-model. In Section \ref{sec:parallel} we discuss some generic
-parallelization techniques, due to Hoyer, Spalek, Takahashi, and Tani,
-that have been behind the recent push towards constant-depth circuits.
-In Section \ref{sec:ft} we discuss the connection of parallel classical
-control and unitialized qubits to fault-tolerance and error-correcting codes.
-In Section \ref{sec:magic} we find another unifying theme in the literature,
-which is the source of a beautiful geometric perspective to UQC, called
-magic state distillation. In Section \ref{sec:hamsim} we apply our model to
-measure the performance of a useful problem in quantum computing,
-namely that of simulating the Hamiltonian of a quantum system.
-Finally, we conclude in Section \ref{sec:conclude} with some open problems
-and interesting directions for future research to explore the themes developed
+various optimizations over the years. In Section \ref{sec:factor}, we
+discuss the problem of factoring integers with a view towards approximation
+and reducing depth.
+In Section \ref{sec:ft}, we discuss the connection of parallel classical
+control to fault-tolerance and error-correcting codes.
+In Section \ref{sec:magic}, unify the ideas of uninitialized qubits and
+error correction to the problem of
+magic state distillation. In Section \ref{sec:hamsim}, we suggest
+possibilities for parallelizing
+the simulation of a quantum system.
+Finally, we conclude in Section \ref{sec:conclude} with
+some interesting directions for future research to explore the themes developed
 in this report.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{The Rules of Quantum Mechanics}
-
-An extensive background in quantum physics is not necessary to begin
-working in and appreciating quantum computing or the work in this report.
-The interested reader is referred to the standard textbook in this field
-\cite{Nielsen2000}, but we will cover the mathematical basics here.
-In general, quantum mechanics for the purposes of computing can be
-explained in four rules.
-
-Here I want to use Latex definitions with boldface for the terms, but I
-forgot how to do that.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Rule 1: Qubits}
-
-Rule 1 [Qubits]: Our basic unit of information is a quantum bit (\emph{qubit}),
-a two-level system which can be represented by a column vector with
-complex coefficients whose magnitudes squared sum to 1. These are known
-as probability amplitudes for reasons which will become clear in Rule 4.
-A quantum state
-is written using Dirac bra-ket notation due to a visual pun for the
-inner product, or the overlap between two quantum states.
-The states $\ket{0}$ and $\ket{1}$ are known as the computational basis,
-and correspond to our normal idea of classical bits.
-
-\begin{equation}
-\ket{\psi} = \alpha \ket{0} + \beta \ket{1} \qquad
-|\alpha|^2 + |\beta|^2 = 1
-\end{equation}
-
-There is a nice correspondence between a single-qubit state and a geometric
-picture known as the Bloch sphere, shown in Figure \ref{fig:bloch-sphere}.
-We will return to this Bloch sphere picure later in talking about
-magic state distillation in Section \ref{sec:magic}.
-The north pole represents $\ket{0}$ and the south pole represents $\ket{1}$.
-
-\begin{figure}
-\label{fig:bloch-sphere}
-\caption{The famous Bloch sphere}
-\end{figure}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Rule 2: Tensor Product}
-
-Individual qubits are not very useful, so we
-can combine via the tensor product to form larger quantum
-states. A two-qubit quantum state can exist as a complex superposition of
-four two-bit classical states, still with probability amplitudes that sum to
-one.
-
-\begin{equation}
-\ket{\psi} = \alpha \ket{00} + \beta \ket{01} + \gamma \ket{10} + \delta \ket{11}
-\end{equation}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Rule 3: Unitary Operations}
-
-Rule 3 [Unitary Operations]:
-Qubits can be transformed by operations (also called \emph{gates})
-that take the form of $2\times 2$ unitary matrices of unit determinant.
-That is, they are reversible ($UU^\dagger = I$) and preserve the magnitude
-of quantum states.
-
-\begin{equation}
-\left[ \begin{array}{cc}
-a & b \\
-c & d \\
-\end{array} \right]
-\end{equation}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Rule 4: Measurement}
-
-Rule 3 [Measurement]: While a qubit can exist in a superposition
-of computational basis states, when measured (that is, interacted with a
-large macroscopic object like a human-sized scientific instrument), it
-collapses to either $\ket{0}$ with probability $|\alpha|^2$ or
-$\ket{1}$ with probability $|\beta|^2$.

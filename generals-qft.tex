@@ -15,7 +15,7 @@ how to factor without the QFT,
 using just phase estimation \cite{Kitaev2002} \cite{Cleve2000}, which may
 be desirable due to the fine $\Lambda(R_k)$ controlled-phase rotations involved.
 These are difficult to compile into an efficient, fault-tolerant, universal
-gateset as described later in Section \ref{sec:ft}.
+gateset since it involves non-Clifford single-qubit rotations $\Lambda(e^{i\theta})$.
 
 \begin{equation}
 \label{eqn:rk}
@@ -37,17 +37,20 @@ the transform adder by Draper \cite{Draper2000} and extensions to Grover's
 search algorithm \cite{Grover1996} \cite{Brassard1998} \cite{Mosca1999}.
 While this gives the QFT somewhat of a vintage feel within the community,
 it is still a venerable, useful technique.
-Therefore, it makes an ideal candidate for analyzing its optimization
-over the years as we will do in the rest of this section.
+Therefore, it makes an ideal candidate for analyzing its depth optimization
+over the years, using the techniques
+of approximation and unbounded fan-out.
 
-We will show how the QFT has been parallelized and its depth decreased from the
+In the rest of this section,
+we will show how the QFT has been parallelized and its depth decreased from the
 initial quadratic
 value \ref{subsec:qft-quad} down to
 log-linear \ref{subsec:qft-loglin},
-linear \ref{subsec:qft-linear}, and logarithmic depth\ref{subsec:qft-log},
-as well as its circuit space in each case and error probability, where
-appropriate.
+linear \ref{subsec:qft-linear}, and logarithmic depth \ref{subsec:qft-log},
+as well as circuit space and its error probability, where
+appropriate. 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The Discrete Fourier Transform}
 
 As the name implies, the QFT is inspired by the classical, discrete
@@ -57,6 +60,7 @@ each in different domains.
 
 \begin{equation}
 y_k \equiv \frac{1}{\sqrt{N}} \sum_{j=0}^{N-1} x_j e^{2\pi i j k / N}
+\label{eqn:dft}
 \end{equation}
 
 This is the idea behind the fast Fourier transform (FFT) \cite{Cooley1965}
@@ -71,7 +75,7 @@ the computational basis $\{\ket{0}, \ket{1}, \ldots, \ket{N-1}\}$
 and the other we call the \emph{Fourier basis}. The complex amplitudes
 $x_j$ of a
 particular $\ket{j}$ are related to the amplitudes $y_k$ of all the $\ket{k}$
-by the discrete Fourier transform.
+by the discrete Fourier transform in Equation \ref{eqn:dft}.
 
 \begin{equation}
 \ket{j} = \frac{1}{\sqrt{N}} \sum_{k=0}^{N-1} e^{2\pi i j k / N} \ket{k}
@@ -113,6 +117,7 @@ with high probability.
 %of quantum states, and demonstrate some examples of highly-entangled
 %states and product states]
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The Product Representation}
 
 %In one domain, we have information encoded in the bits of the computational
@@ -164,6 +169,7 @@ as described in \cite{Cleve2000}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{QFT in $O(n^2)$ Depth}
+\label{subsec:qft-quad}
 
 The most well-known circuit for the QFT from Nielsen \& Chuang
 \cite{Nielsen2000} applies each of the following gates in sequence.
@@ -193,6 +199,7 @@ $O(n^3)$ with an error probability of $0$ since this is an exact circuit.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{QFT in $O(n\log n)$ Depth}
+\label{subsec:qft-loglin}
 
 Almost immediately after Shor's original paper, Coppersmith noted that we
 could cut off the rotations $R_k$ after some maximum $k_0 = O(\log(n/\epsilon))$
@@ -215,6 +222,7 @@ error probability $1/poly(n)$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{QFT in $O(n)$ Depth}
+\label{subsec:qft-linear}
 
 It was noted by Moore and Nilsson \cite{Moore1998} and widely attributed
 to folklore that the QFT would be further parallelized by swapping qubits
@@ -231,7 +239,7 @@ architecture of Kutin \cite{Kutin2006}.
 %%%%%%%%%%
 \begin{figure}
 \label{fig:qft-fdh}
-\caption{The nearest-neighbor QFT circuit in 1D NTC \cite{Fowler2006}.}
+\caption{The nearest-neighbor QFT circuit in 1D NTC \cite{Fowler2004}.}
 \end{figure}
 
 This reduces the depth to $O(n)$, while the size and width remain the same
@@ -241,6 +249,7 @@ this is an exact circuit.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{QFT in Depth $O(\log n)$}
+\label{subsec:qft-log}
 
 To further exploit the fact that operations on disjoint qubits can be done
 in parallel, Cleve and Watrous discovered that one could fanout the control
@@ -273,11 +282,14 @@ the same as the AQFT.
 
 \subsection{QFT Summary}
 
-Here is a table summarizing circuit size, depth, width, space, and
-error probability. For the approximate circuits, we set $\epsilon = 1/O(n^2)$,
+Table \ref{tab:qft-summary} summarizes the circuit size, depth, width, space, and
+error probability for the QFT implementations discussed in this section.
+For the approximate circuits, we set $\epsilon = 1/O(n^2)$,
 since this is the per-gate error we would need to get a constant
 error probability for a QFT circuit on $n$ qubits with size $O(n^2)$.
 
+\begin{center}
+\begin{figure*}
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
 \textbf{Author} & \textbf{Depth} & \textbf{Size} & \textbf{Width} & \textbf{Space} & \textbf{Error}\\
@@ -290,6 +302,10 @@ CW & $O(\log \log n)$ & $O(n \log n)$ & $O(n^2)$ & $O(n^2 \log\log n)$ & $1/O(n^
 BKP & $O(1)$ & $O(n^2)$ & $O(n^2)$ & $O(n^2)$ & 0\\
 \hline
 \end{tabular}
+\caption{Summary of circuit resources for different QFT implementations.}
+\label{tab:qft-summary}
+\end{figure*}
+\end{center}
 
 Cleve and Watrous mention the open problem of computing an exact QFT in
 sub-logarithmic depth. However, this predates the constant-depth result of

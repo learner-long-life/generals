@@ -3,174 +3,149 @@
 
 Shor's factoring algorithm in 1994 was the first and most famous example of an
 exponential speedup of quantum computers over classical computers.
-\cite{Shor1994}
-As such, it is still an active area of research, both in optimizing the
-circuit \cite{Cleve2002} and the experimental implementation. (actually,
-I don't know of any
-recent experiments that are getting close to doing this again).
-
+\cite{Shor1994}, although like the QFT, it is beginning to show its age.
 Although we study this problem in greater depth in a separate work
 \cite{Pham2012b}, we mention here some interesting techniques introduced
 specifically for factoring but which may have wider applications.
 
-\subsection{Modular Entangled States}
+\subsection{Uninitialized Qubits and Approximate Algorithms}
 
-In most quantum computations, qubits become part of a larger and larger
-entangled state throughout the computation until finally the output
-qubits are measured, and the entire system collapses to one of the
-computational basis states. This is the reason why we uncompute ancillae,
-to reduce the size of the entangled state, and in some sense this is what
-we are measuring with the circuit space resource.
+Parker and Plenio \cite{Parker2000} discovered that Shor's factoring algorithm
+could still have a low error probability even if $n$ of the $2n$ ancillae qubits
+were unitialized. That is, they introduced two important notions: approximate
+algorithms and unitialized qubits.
+An \emph{approximate algorithm} as one which succeeds for a certain fraction of
+its ancillary inputs, which is determined by the structure of the algorithm.
+For the example of factoring, the algorithm will fail if the ancillae
+register for modular multiplication starts out in a state $\ket{\alpha}$
+where $\alpha$ is a number that is not coprime with the modulus to be factored,
+$m$. If $m$ is truly prime, then all $\alpha$ will be corprime to it, but
+if $m$ is not a smooth number (that is, if $m$ is a product of many prime
+factors) then a significant fraction of initial values $\ket{\alpha}$ will
+cause the algorithm to fail.
 
-However, such a large entangled state is vulnerable to decoherence, where
-a single error anywhere can destroy the entire state. In an encoded state,
-it may take more errors, but in general we might like to keep the
-state as modular as possible, the product of multiple smaller entangled
-states. If we have lots of parallelism available, we may choose to
-prepare multiple redundant copies of an entangled state.
-If unrecoverable errors are detected in any block, we can discard
-that block and use a equivalent one from the same set.
-In this way, we probabilistically build up a larger entangled state out of
-a product state, similar to the post-selection approach of Knill
-(citation neeed here).
+Zalka further improved this result so that none of
+the ancillae need be initialized \cite{Zalka2006}, although at the cost of
+a more complicated modular multiplication algorithm.
+To overcome adversarial inputs,
+he recommends randomizing the ancillae by randomly applying Pauli operators
+to the ancillae before beginning the algorithm.
+However, both the Zalka and Parker-Plenio result assume the ancillae qubits
+can be in a superposition of computational basis states, but are otherwise
+pure states in that they are not entangled with the environment or any other
+qubits. This may not be a realistic assumption in practice for uncooled
+qubits in the laboratory. A more realistic model, for the power of a
+single (potentially mixed) qubit is given by Knill and LaFlamme in their
+definition of DQC1, the complexity class of problems computable with one
+uninitialized qubit \cite{Knill1998}.
 
-However, in many computations, especially those that we can parallelize,
-like the phase estimation procedure of KSV or Cleve-Watrous,
-many states are prepared in parallel and only entangled at the end.
-Therefore, we propose an approach of modular entanglement.
+Nevertheless, unitialized qubits are an alternative circuit resource which
+may be considered in the future and share a lot of features in common with
+magic state distillation, which we discuss in Section \ref{sec:magic}. In
+contrast to circuit size, width, and depth, it is advantageous for
+an architecture or algorithm
+to allow more uninitialized qubits rather than fewer.
 
-\subsection{Zalka's Uninitialized Qubits}
+\subsection{Approximate Modular Multiplication}
 
-In the circuit resources we mentioned in Section \ref{sec:circuit},
-we introduced uninitialized qubits. Well, here they are.
-
-Zalka's definition of uninitialized qubits is that they start in an
-arbitrary state $\ket{\alpha}$ instead of $\ket{0}$. He defines
-\emph{approximative} algorithms as those which succeed for ``most'' inputs,
-say for $1/n$ fraction of them. Since some states may be bad and we may be
-worried about adversarial noise feeding us these bad states as input, we can
-randomly initialize the states into a maximally-mixed state by applying
-random Pauli operators to every qubit. In reality, we may do this by
-using classical random bits to control these Pauli operators, and then discarding
-these classical bits.
-
-I'm not convinced this actually works to create the maximally mixed state
-$\rho = I / d$, or that this is the same as an equal superposition of computational
-basis states, which Zalka states is what he considers a "mixed" state at one
-point. For example, if we start in the cat state, in some sense the
-``maximally entangled'' state, applying random unitaries just creates a
-cat state up to these Pauli corrections. He also assumes if you have two
-registers, say $\ket{\alpha}$ and $\ket{\beta}$, that they are not entangled,
-or at least that you can randomize them so that their entanglement does not
-hurt you.
-
-Furthermore, the extra work we have to do to randomize the inputs may
-negate the benefits of not having to cool down these qubits. I don't know
-the actual experimental physics involved, but it seems that most of the work
-is in cooling down, say, trapped ions, to the lowest two energy states.
-After that, cooling down to the ground state is relatively easy. So it's not
-clear that we are saving that much work.
-
-\subsection{Zalka's Coset Representation}
-
-In the same work \cite{Zalka2002} Zalka also introduces the idea of a
-coset representation, an alternative basis for encoding integers that
-makes approximate modular addition easy. In this representation,
-an integer $\ket{b}$ is transformed into a superposition of itself
-plus multiples of the modulus $N$.
+Zalka also studied an earlier idea of approximation in factoring, namely
+approximate modular multiplication \cite{Zalka1998}.
+This idea is instrumental in Kutin's linear-depth modular multiplier,
+used to achieve a 1D NTC architecture for factoring in $O(n^2)$ depth
+\cite{Kutin2006}. In factoring, we perform several rounds of period-finding,
+choosing a random $a \in \mathbb{Z}_m$ for factoring an $n$-bit modulus $m$.
+We must then
+perform $2n$ multiplications of $a$ raised to various powers of two
+into an $n$-qubit quantum register containing $\ket{b}$, where
+$b = \sum_{i} 2^ib_i$. Each
+modular multiplication must compute the $n$-bit modular product
+$r$ as in Equation \ref{eqn:modmult-r}.
 
 \begin{equation}
-\ket{b} \rightarrow \sum_{x} \ket{b + xN}
+r \equiv abc \equiv \sum_{i} 2^i a b_i c_j \equiv \sum_{i} (b_i c_j)(2^i a^{2^j} \bmod m) \bmod m
+\label{eqn:modmult-r}
 \end{equation}
 
-The spectrum picture of this transformation is shown in
-Figure \ref{fig:coset-spectrum}
-
-\begin{figure}
-\label{fig:coset-spectrum}
-\caption{The spectrum picture of the coset representation}
-\end{figure}
-
-In this representation, adding another classical number $a$ modulo $N$
-takes the following form:
+This involves adding $2n$ classically precomputed numbers
+$(2^i a^{2^j} \bmod m)$ which are controlled on a bit $c_j$
+which is later measured as
+part of phase estimation. Normal, non-modular multiplication can be done
+in linear-depth using Draper's transform adder \cite{Draper2000}. This gives
+us the sum $s$ in Equation \ref{eqn:modmult-s}. Here we rewrite the
+bit $b_i c$ as $y_i$ and the $n$-bit number $2^i a^{2^j} \bmod m$ as
+$x_i$. However,
+the modular reduction part is the most resource-intensive, that is,
+determining $q$ and them subtracting $qm$ from $s$ to get $r$.
 
 \begin{equation}
-\ket{b+a} \rightarrow \ket{y} = \sum_{x} \ket{b + a + xN} \approx
-\ket{\hat{y}} = \sum_{x} \ket{b + a + xN \bmod N}
+s = \sum_i b_i c_j (2^i a^{2^j} \bmod m) = \sum_i y_i x_i = r + qm
+\label{eqn:modmult-s}
 \end{equation}
 
-The second approximately equals sign is due to the fact that given
-sufficiently large $x_max$, the overlap between $\ket{y}$ and
-$\ket{\hat{y}}$ is still large. In a sense, we just neglect modular reduction
-and allow the periodic structure of our coset representation to ``absorb''
-these errors. We must therefore increase the size of the register holding
-$\ket{y}$. For $4n^2$ modular additions, such as those required in Shor's
-algorithm, it suffices to set $x_max = 10000n^2$ (FACT CHECK THIS) and
-therefore the size of the register to be $n + 2\log{n}$ bits (ALSO FACT
-CHECK THIS).
-
-The error / overlap is calculated as follows:
+Note that $q$ can be encoded in $\lceil \log_2 n \rceil$ bits, and we can
+express it as a sum followed by a division as in Equation \ref{eqn:modmult-q}.
 
 \begin{equation}
-\bra{\hat{y}}\ket{y} = 1 - \frac{1}{x_{max}}
+q = \lfloor ( \sum_{i} y_i x_i ) / m \rfloor
+\label{eqn:modmult-q}
 \end{equation}
 
-Of course, converting between the coset representation and the computational
-basis is rather inefficient. This technique is also used in
-Hales and Hallgren (cite appropriate work here).
+In general, if we wanted to obtain $q$ by the division $\lfloor s/m \rfloor$,
+we would perform $\lceil \log_2 n \rceil$ trial subtractions of the
+$n$-bit numbers $2^{k-1} m$ to determine the
+bits $q_k$, for $k \in {1, \ldots, n}$. However, in the transform adder,
+we would have to change into and out of the Fourier basis every time to
+compare the value of the high bit $q_k$ to see if we underflowed the register
+or not. This would normally take depth $O(n^2)$.
 
-\subsection{Kutin's 1D NTC Factoring}
+Zalka's key idea, developed by Kutin, is that we can approximate $q$ by
+$\hat{q}$, where in the sum in Equation \ref{eqn:modmult-q} we replace
+$x_i$ with $\hat{x}_i$, where we keep the upper $\ell$ bits and set the
+lower $n - \ell$ bits to 0. Now we are only doing trial subtractions with
+$\log_2 n$-bit numbers, and we can compute $\hat{q}$ in depth $O(\log^2 n)$.
 
-Zalka's ideas appear again in Kutin's 1D NTC architecture for factoring
-\cite{Kutin2006}
-where they are used to get a remarkable linear-depth modular multiplier.
-While they build on the 1D NTC work of Fowler, Devitt, and Hollenberg
-\cite{Fowler2004} using the triangular QFT, they also introduce the
-idea of approximating the modular multiple $q$ in the following
-equation.
+What is the error in this approximation? With probability $2^{-\ell}$,
+$\hat{q} \ne q$. If we set $\ell = 2\log_2 n$, we get a constant error
+probability. The intuitive idea of this is that for some values of
+$a \in \mathbb{Z_m}$, the lower $n - \ell$ bits of $x_i$ add up to more than
+$m$ and cause $\hat{q}$ to be greater than $q$. We know which values of $a$
+will cause a problem in advance, but we must also choose $a$ randomly for
+quantum period-finding to succeed in factoring.
 
-\begin{equation}
-s = \sum_i b_i c (2^i a \bmod m) = r + qm
-\end{equation}
+Unfortunately, this technique is unlikely to improve the 2D NTC factoring implement of
+Ref. \cite{Pham2012b} which already has constant-depth modular reduction.
+However, it might serve as inspiration for future approximate algorithms.
 
-What I want to emphasize from this algorithm is the approximation of
-$q$ by neglecting the low-order bits of $x$. As long as the sum of these
-low-order bits do not equal $m$, then $\hat{q}$ and $q$ are approximately
-equal, and no error occurs. Here $\hat{q}$ is calculated using the
-top $\ell_0$ bits of each $x_i$, where
-$\hat{x}_i = 2^{n-\ell_0}\lfloor x_i \rfloor$, that is $x_i$ with the
-bottom $n-\ell_0$ bits set to 0.
+%What I want to emphasize from this algorithm is the approximation of
+%$q$ by neglecting the low-order bits of $x$. As long as the sum of these
+%low-order bits do not equal $m$, then $\hat{q}$ and $q$ are approximately
+%equal, and no error occurs. Here $\hat{q}$ is calculated using the
+%top $\ell_0$ bits of each $x_i$, where
+%$\hat{x}_i = 2^{n-\ell_0}\lfloor x_i \rfloor$, that is $x_i$ with the
+%bottom $n-\ell_0$ bits set to 0.
 
-\begin{equation}
-\hat{q} = \lfloor (\sum_{i} y_i \hat{x}_i ) / m \rfloor
-\end{equation}
+%\begin{equation}
+%\hat{q} = \lfloor (\sum_{i} y_i \hat{x}_i ) / m \rfloor
+%\end{equation}
 
-The steps to compute $q$ are to perform division via the following algorithm
-For bits $k = \log_2 n$ downto 1, subtract $2^{k-1}m$ from the sum $s$ as a
-trial. Apply an inverse QFT to get the high-order bit
-$q_k$ in the computational
-basis, which is $1$ if there is an overflow (in 2's complement representation).
-Convert back into the Fourier basis with another QFT, and use $q_k$ to
-control addition of $2^{k-1}m$ back if necessary.
-Since we are only operating on $O(\log_2 n)$ bits, this somewhat inefficient
-process nevertheless only takes depth $O(\log^2 n)$.
+%The steps to compute $q$ are to perform division via the following algorithm
+%For bits $k = \log_2 n$ downto 1, subtract $2^{k-1}m$ from the sum $s$ as a
+%trial. Apply an inverse QFT to get the high-order bit
+%$q_k$ in the computational
+%basis, which is $1$ if there is an overflow (in 2's complement representation).
+%Convert back into the Fourier basis with another QFT, and use $q_k$ to
+%control addition of $2^{k-1}m$ back if necessary.
+%Since we are only operating on $O(\log_2 n)$ bits, this somewhat inefficient
+%process nevertheless only takes depth $O(\log^2 n)$.
 
-We can calculate the circuit space of this block as follows.
+%We can calculate the circuit space of this block as follows.
 
-The success probability is determined by the parameter $\ell_0$. To get
-a constant, we set $\ell_0 = 2\log_2 n$ something something, oh god please
-fact check this.
+%The success probability is determined by the parameter $\ell_0$. To get
+%a constant, we set $\ell_0 = 2\log_2 n$ something something, oh god please
+%fact check this.
 
-Then the space-success product is
+%Then the space-success product is
 
-\begin{equation}
-\frac{\log^3 n}{\epsilon}
-\end{equation}
-
-
-\subsection{The Semi-Classical QFT Circuit in Width}
-
-This is the Beauregard circuit, but it is really for phase estimation.
-I need to think some more before I go around indiscriminately trying to compare
-it directly to other QFT circuits.
-
+%\begin{equation}
+%\frac{\log^3 n}{\epsilon}
+%\end{equation}

@@ -1,96 +1,367 @@
 \section{Quantum Circuit Resources}
 \label{sec:circuit}
 
-Here we can mostly copy from my other papers, where I define quantum
-architecture as being the connecting layer between quantum algorithms
-and physical experiment. It's a really necessary connection, since otherwise
-nice algorithms are ignored or unknown by experimentalists for lack of a
-realistic mapping or being the resources are still too huge. Therefore, the
-gains to be made in quantum architecture are usually not of the exponential
-variety, but are polynomially gains asymptotically, which may turn out to be
-huge in practice with actual constants. This may make the difference between
-implementing a quantum computer in a few years versus several decades, if you
-think we can sustain dramatic tension with DARPA / NSA / IARPA that long.
+A \emph{quantum architecture} is a physical layout of qubits which constrains
+which qubits can interact with each other, usually optimized to run a particular
+``hard-coded'' algorithm. Like classical architecture, it is the
+connecting layer between mathematical formalism and experimental implementation.
+Design decisions here affect whether an exponential speedup at the
+algorithmic level is still maintained when we translate it to running on
+hardware, during human timescales. There are two kinds of overhead studied in quantum architecture,
+corresponding to compiling, which we will discuss in \ref{subsec:compile},
+and error-correction, which we defer until Section \ref{sec:ft}. These
+overheads, and their improvements, are usually of the polynomial variety.
+Nevertheless, these may be numerically significant in practice and make the
+difference between completing your quantum algorithm in a few years versus
+several decades. Imagine how long you can sustain dramatic tension with
+your funding agency.
 
-\subsection{The View}
+Quantum architecture and their resources are described on top of the framework of
+the quantum circuit model, which we now describe. Quantum algorithms are described as
+the application of dynamic gates over time to
+qubits, which usually begin in some
+fiducial state $\ket{0}^{\otimes n}$ and end in a classical, projective measurement
+to read out a result, although classically-controlled measurements may also
+occur in the ``middle'' of the circuit.
+%This definition abstracts away many interesting physical
+%techniques, such as the shuttling of trapped ions around a surface with
+%tracks to change their interactions \cite{Blakestad2011},
+%but it will suffice for our discussion.
+In the quantum circuit model, qubits are represented by lines,
+and gates here appear as blocks that operate on one or two qubits in a single
+time-step, as time flows from left to right. These qubits are not necessarily
+related to each other spatially.
 
-I also mention here the field of quantum computer engineering, which will
-include as its subfields quantum compilers (gate construction) and quantum
-architecture (layout and error correction). I am mostly concerned
 
-The tone of most of my paper is therefore more practically minded. Sometimes
-mathematical formalism is necessary to realize substantial savings, but I will
-not be overly concerned with nicely erasing my ancillae for the next algorithm
-in line, especially if it means a large number of operations to uncompute it
-to save a relatively small number of ancillae.
-
-Also, I will stick to asymptotic improvements where possible, since these
-statements are less likely to change over time or be dependent on
-as-yet-unknown physical implementation. However, as an engineer I am still
-impressed by numerical improvements, and on occasion I will use actual
-constants to call out changes which would otherwise be lost in $O(\cdot)$
-notation. This may be more appropriate in an intro section, which also
-includes the rules of quantum computing.
-
-\subsection{Circuit Resources}
-
-In the traditional quantum circuit model, qubits are represented by lines,
-and operations over the flow of time going from left to right. Of course,
-due to the way matrix multiplication works, in real-life implementations,
-the gates are applied going from right to left. Gates are represented by
-blocks, and can be single-qubit (occurring on a single line) or
-multi-qubit (spanning multiple lines).
-
+\begin{center}
 \begin{figure}
-\label{fig:circuit-resource.tex}
-\caption{The circuit resources of width, depth, and size as described by others.}
+\begin{displaymath}
+W = 5 \left\{
+\begin{array}{c}
+S = 15 \\
+\Qcircuit @C=1em @R=.7em { 
+	& \gate{H} & \qw & \ctrl{1} & \gate{H} & \qw & \qw      & \ctrl{1} & \qw \\ 
+	& \gate{H} & \qw & \targfix & \ctrl{2} & \qw & \gate{K} & \targfix & \qw \\
+	& \gate{H} & \qw & \gate{K} & \qw      & \qw & \gate{H} & \qw      & \qw \\
+	& \gate{H} & \qw & \ctrl{1} & \targfix & \qw & \gate{H} & \qw      & \qw \\
+	& \gate{H} & \qw & \targfix & \gate{H} & \qw & \qw      & \qw      & \qw
+	\gategroup{1}{2}{5}{9}{.7em}{--}
+}\\
+\xymatrix {
+  & & D=5 \ar[ll] \ar[rr] & & \\
+ }
+\end{array}
+\right.
+\end{displaymath}
+\caption{Quantum circuit resources: size $S$, depth
+$D$, and width $W$}
+\label{fig:circuit-resource}
 \end{figure}
+\end{center}
 
-\emph{Circuit size} is the number of non-identity gates applied over time.
-We specify non-trivial here, since in reality the identity gate may involve
-extensive error-correction just to maintain a coherent quantum state over
-a timestep, even without enacting any logical operation on it.
+Three circuit resources are commonly measured in literature to judge the
+quality of an architecture in implementing an algorithm, as shown in Figure
+\ref{fig:circuit-resource}.
+\emph{Circuit size} is the number of non-identity gates applied over time, and
+is roughly proportional to the square area that a circuit diagram takes up
+on paper. In
+reality, a qubit may have to undergo active error-correction to even maintain
+a coherent state, but identity gates are usually disregarded at the algorithmic
+level.
 \emph{Circuit width} is the total number of qubits used in a computation,
-including those storing the input and the output. It is fashionable in other
-papers to only count ancillary qubits (ancillae), that is, the temporary 
-scratch space used by the computation, which start out in the $\ket{0}$ state
-and must be returned to it. This makes the circuit width smaller, and a more
-impressive figure. However, this makes it hard to compare circuits
-which compute the output in-place, ``on-top'' of the input qubits to save
-space, to speak, versus those who compute out-of-place. Furthermore,
-the output of one circuit is often the input to another, and in a practical sense,
-we are interested in how many qubits we must physically maintain over time in
-our experiment, and not whether these qubits store the inputs or outputs per se.
-\emph{Circuit depth} is in some ways the most important figure. It describes
-the number of parallel timesteps needed to complete a computation, given enough
-parallel classical controllers. It provides a lower bound on the running time,
-and like classical circuit depth, is analogous to the delay we can expect
-from entering out inputs to getting a result.
+including those storing the input and the output, and visually corresponds to
+the number of lines or the height on paper of the circuit diagrams.
+\emph{Circuit depth} describes the number of parallel timesteps needed to
+complete a computation, intuitively the horizontal length on paper of a circuit,
+where each gate takes a unit timestep. It is the delay
+we can expect from entering our inputs until we get a result, and it takes
+center stage in this report. It is the one that all the cool kids try to
+optimize. However, all three circuit resources interact
+with each other---decreasing depth usually increases size and width analogous
+to a classical time-space tradeoff.
 
-Quantum architecture is primarily concerned with reducing circuit resources,
-and previous approaches have concentrated on reducing circuit depth, circuit
-width, or some combination of both (cite here the LNN factoring papers,
-Van Meter's stuff).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Circuit Space}
 
+We now introduce a new circuit resource called the \emph{circuit space},
+equal to the size of the coherent state over the lifetime of an algorithm.
+This is inspired by the generic entangled resource state created initially
+in the measurement-based quantum computing (MBQC) model
+model of Raussendorf, Browne, and Briegel \cite{Raussendorf2003},
+which also inspired the unbounded fan-out gate behind many of the constant-depth
+circuits mentioned in this report.
+
+The intuition behind defining circuit space is that it is practically
+more difficult to maintain a single large coherent state for a long period
+of time. While input qubits to the circuit generally begin in a classical
+product state, as the circuit executes, eventually all qubits become entangled
+with each other in a single computation output state
+in order to affect the output, with the exception of
+ancillae qubit which may become uncomputed back to $\ket{0}$ and therefore
+leave the computation state again.
+
+We can trace back this computation state from the output by reversing the
+history of the circuit and see how it
+branches as we return to the inputs, and include it in our cumulative
+circuit space.
+Decreasing circuit depth reduces the amount of time that the circuit space
+must be kept coherent, but it may also increase the circuit
+width over time and therefore increase the circuit space itself.
+The circuit space is upper bounded by the product of the circuit width and
+circuit depth, since in the worst case every qubit is being operated on with
+an entangling operation for the entire duration of the circuit.
+The circuit space is lower bounded by the circuit size, since we cannot
+increase the computation state with an entangling gate without also
+adding to the circuit size with that gate. Between those two bounds, there is
+a lot of room for variability and improvement, as demonstrated in our
+examination of QFT circuits in Table \ref{tab:qft-summary}.
+
+In the rest of this section, we will give an overview of different models for
+quantum architectures, discuss universal gate sets,
+and then describe quantum compilation in more detail.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Architectural Models}
 
 We follow here the terminology of Van Meter \cite{VanMeter2006} in his
-definition of architectural models with different constraints, going from
-very abstract but simple to more realistic but with more complicated constraints.
+definition of architectural models. Most algorithm designers assume
+that arbitrary qubits can interact in a quantum circuit, and furthermore
+two qubits on adjacent lines in a circuit diagram may not necessarily
+be adjacent in a physical implementation. This is the simplest, but least
+physically realistic model, called the Abstract Concurrent ($\textsc{AC}$) model.
+Single- and two-qubit gates are allowed to operate within the same
+timestep on disjoint qubits.
 
-The qubits in the circuit models above are not
-necessarily related spatially, and arbitrary interactions are allowed.
-This is called the Abstract Concurrent (\textsc{AC}) model.
+However, in the laboratory, it is usually the case that only spatially-local
+qubits can interact with each other. If we restrict the physical layout of
+the qubits to be in one dimension, such as in a linear ion trap, and
+allow only nearest-neighbor two-qubit gates (with the same concurrency and
+single-qubit gates as $\textsc{AC}$, then we get the model called
+$\textsc{1D NTC}$. If we allow the qubits to be laid out in two dimensions,
+such as in modern surface ion traps \cite{Blakestad2011} or
+proposed topological qubits using
+Majorana fermions on 1D nanowires \cite{Bonderson2010}, we get the
+model called $\textsc{2D NTC}$. Intuitively, this extra degree of freedom allows
+data to move around each other efficiently using constant-depth teleportation.
+This has been shown to reduce the depth of arithmetic and factoring
+algorithms running on 2D architectures over
+their 1D counterparts \cite{Choi2010} \cite{Pham2012b}, from $O(n)$ to
+$O(\sqrt{n})$ or even $O(\log^2 n)$.
+Naturally, this can be extended to higher dimensions, as shown in the
+context of unbounded fan-in controlled operations in $k$ dimensions for
+Grover's search algorithm \cite{Rosenbaum2012}. These architectures are
+called $k\textsc{D NTC}$, and without classical control they have a 
+lower bound of 
+$O(\sqrt[k]{n})$ depth.
 
-If we stipulate that the qubits then must be spatially related, in that
-neighboring qubits in the circuit diagram are actually neighboring in real-life,
-we take the natural shape of the entire arrangement of qubits to be in a line.
-For the sake of realism, we only allow neighboring-qubits to interact, and we
-only allow single-qubit and two-qubit gates. Due to various universality
-proofs and fault-tolerance, it suffices to restrict ourselves to single-qubit
-operations which are from the Clifford group and the $\pi/8$ gate and CNOT.
-(Cite here Nielsen \& Chuang, or KSV). We allow concurrent operations
-acting on disjoint sets of qubits to occur within the same timestep.
-This is called \textsc{1D-NTC}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Universal Gate Set}
+\label{subsec:universal}
 
-Next, it becomes natural to extend this model into two dimensions,
+In classical computing, the two-input NAND gate is universal for producing
+all boolean functions, and indeed, all classical processors consist of
+transistors which essentially perform NAND and similar logical operations
+efficiently. What is the quantum equivalent?
+
+Due to the requirements of error-correction, we can only perform a discrete
+set of
+quantum gates fault-tolerantly. In many error correcting codes, this gate
+set corresponds to the \emph{Clifford group}, which we denote $\mathcal{C}_n$.
+This group is defined as the
+normalizer of the Pauli group $\mathcal{P}_n$.
+That is, it is the set of gates which
+when conjugated around a Pauli operator still stays within $\mathcal{P}_n$.
+
+For single-qubit operations, the single-qubit Clifford group $\mathcal{C}_1$
+is generated by the elements $H$ (called the Hadamard operator),
+and $K$ (called the phase gate) along with arbitrary phases as defined below:
+
+\begin{equation}
+H = \normtwo
+ \left[
+  \begin{array}{cc}
+    1 & 1 \\
+    1 & -1 \\
+  \end{array} \right]
+\qquad
+K = 
+ \left[
+  \begin{array}{cc}
+    1 & 0 \\
+    0 & i \\
+  \end{array} \right]
+\end{equation}
+
+There are 24 elements in $\mathcal{C}_1$, which also include the Pauli $X$ and
+$Z$ matrices.
+
+In the two-qubit Clifford group $\mathcal{C}_2$, our single-qubit
+generators are the
+same as for $\mathcal{C}_1$, on either the first or second qubit,
+and we add the CNOT (controlled NOT) gate, sometimes written as $\Lambda(X)$, which
+is the same as a classical reversible XOR operation.
+
+\begin{equation}
+\Lambda(X) = 
+ \left[
+  \begin{array}{cccc}
+    1 & 0 & 0 & 0\\
+    0 & 1 & 0 & 0\\
+    0 & 0 & 0 & 1\\
+    0 & 0 & 1 & 0
+  \end{array} \right]
+\end{equation}
+
+However, even that is not sufficient to be universal. We must add either
+the Toffoli gate, which is a doubly-controlled NOT sometimes written as
+$\Lambda^2(X)$, or the $R_Z(\pi/8)$ gate, sometimes called the $\pi/8$ gate
+due to the double-covering between $SU(2)$ and $SO(3)$.
+
+\begin{equation}
+\Lambda^2(X) = 
+ \left[
+  \begin{array}{cccccccc}
+    1 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+    0 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\
+    0 & 0 & 1 & 0 & 0 & 0 & 0 & 0\\
+    0 & 0 & 0 & 1 & 0 & 0 & 0 & 0\\
+    0 & 0 & 0 & 0 & 1 & 0 & 0 & 0\\
+    0 & 0 & 0 & 0 & 0 & 1 & 0 & 0\\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 & 0
+  \end{array} \right]
+\end{equation}
+\begin{equation}
+ R_Z(\pi/8) = 
+ \left[
+  \begin{array}{cc}
+    1 & 0 \\
+    0 & e^{i\pi/4} \\
+  \end{array} \right]
+\end{equation}
+
+The Toffoli gate itself can be decomposed into single- and two-qubit
+operations involving gates from $\mathcal{C}_2$ and $R_Z(\pi/8)$.
+Both the Toffoli gate and $R_Z(\pi/8)$ are harder to implement
+fault-tolerantly than
+Clifford group elements, and minimizing their occurrence in quantum
+algorithms is a mostly unexplored area in quantum architecture research.
+
+For the purposes of this report, we can define our universal gate set
+as follows.
+
+\begin{equation}
+\mathcal{G} = \mathcal{C}_2 \cup \{ R_Z(\pi/8) \}
+\end{equation}
+
+Now how do we compile down to this gate set?
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quantum Compiling}
+\label{subsec:compile}
+
+Quantum compiling, like
+classical compiling, translates arbitrarily complex high-level ``software''
+operations to physically simple,
+universal, machine-dependent ``assembly'' instructions.
+
+\begin{figure*}
+\begin{displaymath}
+\begin{array}{ccc}
+
+%%%%%%%%%%%%%%%%
+% Source circuit
+\underbrace{
+\begin{array}{c}
+S = 2 \\
+\Qcircuit @C=1em @R=.7em { 
+	& \multigate{4}{U_1} & \qw & \multigate{4}{U_2} & \qw \\ 
+	& \ghost{U_1}        & \qw & \ghost{U_2}        & \qw \\
+	& \ghost{U_1}        & \qw & \ghost{U_2}        & \qw \\
+	& \ghost{U_1}        & \qw & \ghost{U_2}        & \qw \\
+	& \ghost{U_1}        & \qw & \ghost{U_2}        & \qw 
+	\gategroup{1}{2}{5}{4}{.7em}{--}
+}\\
+\xymatrix {
+  & D=2 \ar[l] \ar[r] & \\
+ }
+\end{array}
+}_{C}
+
+& 
+\begin{array}{c}
+\textsc{Quantum Compiler} \\
+\rightarrow
+\end{array}
+&
+
+%%%%%%%%%%%%%%%%
+% Target circuit
+\underbrace{
+\begin{array}{c}
+D' = 15 \\
+\Qcircuit @C=1em @R=.7em { 
+	& \gate{H} & \qw & \ctrl{1} & \gate{H} & \qw & \qw      & \ctrl{1} & \qw \\ 
+	& \gate{H} & \qw & \targfix & \ctrl{2} & \qw & \gate{K} & \targfix & \qw \\
+	& \gate{H} & \qw & \gate{K} & \qw      & \qw & \gate{H} & \qw      & \qw \\
+	& \gate{H} & \qw & \ctrl{1} & \targfix & \qw & \gate{H} & \qw      & \qw \\
+	& \gate{H} & \qw & \targfix & \gate{H} & \qw & \qw      & \qw      & \qw
+	\gategroup{1}{2}{5}{9}{.7em}{--}
+}\\
+\xymatrix {
+  & & D'=5 \ar[ll] \ar[rr] & & \\
+ }
+\end{array}
+}_{C}
+
+\end{array}
+\end{displaymath}
+
+\caption{A quantum compiler in action}
+\label{fig:qcompile}
+\end{figure*}
+
+Quantum compilers take a
+generic unitary matrix $U$ on $n$-qubits, that is, an element of $SU(2^n)$, and
+attempts to approximate it with a sequence of gates
+(that is, a product of some matrices $V_1\cdots V_k$ )
+from $\mathcal{G}$
+defined in the previous section, using some distance metric like
+operator norm.
+
+\begin{equation}
+|| U - V_1\cdots V_k || < \epsilon
+\end{equation}
+
+Quantum compilers are generally classical algorithms that run on your
+digital computer and produce a deterministic sequence of quantum gates, which
+you can then run in your laboratory (for example, by controlling laser pulses
+for trapped ions). They accept an input circuit and produce a compiled
+output circuit that approximates it, with some increase in circuit size,
+width, and depth.
+
+Compilation is therefore
+one area where one can generically decrease circuit depth, independently of the
+algorithm. The first efficient quantum compiler due to
+Solovay and Kitaev had a depth overhead of $O(\log^3+\nu(n/\epsilon))$,
+where $\nu$ is a constant which can be made arbitrarily small, and no
+ancillae (the width was $O(n)$) \cite{Dawson2005}.
+A more parallel compiling procedure was discovered by Kitaev, Shen, and
+Vyalyi (KSV) with a depth overhead of $O(\log n + \log\log(1/\epsilon))$ but
+with a width of $O(n^3)$ on an $\textsc{AC}$ architecture \cite{Kitaev2002}.
+Due to the tradeoff of depth and width as well as the numerical constants
+involved, decreasing depth may not always be the best option for a particular
+application \cite{Pham2012a}. Moreover, the KSV procedure only compiles
+single-qubit gates, or controlled single-qubit gates, via various
+two-qubit gate identities. It relies on a prior decomposition of
+a unitary matrix in $SU(N=2^n)$ into simpler gates,
+for example multiply-controlled single-qubit gates in
+the palindrome transform of Aho and Svore \cite{Aho2003}.
+
+Austin Fowler's compiler uses a brute force search over group elements of
+$\mathcal{C}_1$ alternating with $R_Z(\pi/8)$. It makes use of some
+optimizations but still runs in classical time $O(1/\epsilon)$.
+This may be optimized using classical parallelization and hardware acceleration
+\cite{Booth2012}, but it will be difficult to scale this approach to
+two-qubit compilation due to the increased size of $\mathcal{C}_2$ (11,520
+elements).

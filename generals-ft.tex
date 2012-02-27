@@ -61,9 +61,9 @@ the base physical layer of qubits as Level 0, we can call the
 initial level of encoding Level 1, and then this second level of encoding
 as Level 2.
 
-\begin{figure}
-\caption{Insert figure of concatenated error correction}
-\end{figure}
+%\begin{figure}
+%\caption{Insert figure of concatenated error correction}
+%\end{figure}
 
 What is the error probability in an encoded gate for the Level 2 block?
 Treating Level 1 qubits as basic units, there are still $c$ locations for
@@ -103,11 +103,10 @@ Error correction consumes vast resources. For the Steane code alone, without
 taking into account nearest-neighbor or other architectural constraints, we
 would require thousands or even tens of thousands of qubits just to execute a
 circuit of a hundred gates. Therefore, people have looked for an alternative
-error-correcting scheme, one that has a higher threshold for the same number
-of qubits. (Although I don't really know how much ancillae the surface code
-consumes).
+error-correcting scheme, one that has a higher threshold.
 
-\subsection{Stabilizer Formalism}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stabilizer Formalism and Surface Code}
 
 Many error correcting codes can be studied in the \emph{stabilizer formalism},
 a very useful framework developed by Daniel Gottesman in his thesis
@@ -118,47 +117,49 @@ to just work with the generating set for the stabilizer, which are often
 much smaller, and the word \emph{stabilizer} is used to refer to the two
 concepts interchangeably.
 
-In fact, in the Gottesman-Knill Theorem, it was found that certain quantum
-operations can be simulated efficiently (in polynomial time) on a classical
+In fact, in the Gottesman-Knill Theorem, it was found that a class of quantum
+operations could be simulated efficiently on a classical
 computer by keeping track of the system dynamics with respect to the
-stabilizer generators. These quantum operations come from the Clifford
-group, or the normalizer of the Pauli group, the set of all operations
-that, by conjugation around elements of $\mathcal{P}_n$ stay within that group.
-The $n$-qubit clifford group is denoted by $\mathcal{C}_n$.
-
-\subsection{Surface Code}
+stabilizer generators. This class corresponds to the Clifford group.
 
 In 1997, Kitaev proposed a radically different kind of error-correcting code,
-one based on the topology of logical qubits \cite{Kitaev1997}.
+one based on the topology of logical qubits \cite{Fowler2009}.
 By requiring logical operators to
 use macroscopic movements of logical qubits around each other in a regular
 lattice, this code can be made robust to local perturbations (noise). The
 encoding can be easily scaled by increasing the lattice size to drive down the
 the error probability.
 
-\begin{figure}
-\caption{Insert picture of surface code lattice here, with stars and plaquettes}
-\end{figure}
+%%%%%%%%%%
+% FIGURE %
+%%%%%%%%%%
+%\begin{figure}
+%\caption{Insert picture of surface code lattice here, with stars and plaquettes}
+%\end{figure}
 
 The surface code is closely related to the toric code but is appealing for
-practical implementation because it can be done in 2D on a finite lattice, and
-it has a very high
+practical implementation because it can be done realistically
+in 2D on a finite lattice, and it has a much higher threshold error rate
+than concatenated error-correcting schemes (approaching 1%).
 The surface code can also be expressed in the stabilizer formalism. Here there
 are two types of stabilizer generators, the $X$ type, which are also called
 star operators because they involve $X$ operators on the $4$ qubits around a 
 vertex, and the $Z$ type, which are also called plaquette operators, which
 involve $Z$ operators on the $4$ qubits around a square.
 
-See the excellent review by \cite{Fowler2007}. I should probably say more about
-the surface code, particularly about only being able to do Clifford operations,
-and needed magic state distillation. Yes, Clifford group operations! I should
-have a whole section about it.
+Just as with other stabilizer codes, it is not possible to do non-Clifford
+gates fault-tolerantly in the surface code. Therefore, we must create
+non-stabilizer states, inject them into our code, and perform controlled
+rotations on them targeting the logical qubits on which we wish to enact
+a non-Clifford gate. These non-stabilizer states that would allow us to
+do $\textsc{UQC}$ are magical in this sense, and we will describe them in the next
+section.
 
-Also, we distinguish here topological error codes, which use topological
-properties of encoded qubits which can be implemented on any physical
-technology, with physically topological qubits, which use quasiparticle
-excitations (anyons) directly to implement qubits. Cite a bunch of papers
-by Station Q, as well as the original proposal by Kitaev.
+%Also, we distinguish here topological error codes, which use topological
+%properties of encoded qubits which can be implemented on any physical
+%technology, with physically topological qubits, which use quasiparticle
+%excitations (anyons) directly to implement qubits. Cite a bunch of papers
+%by Station Q, as well as the original proposal by Kitaev.
 
 \subsection{Parallelism}
 
@@ -168,10 +169,10 @@ and the coherence of quantum states are very fragile, error syndromes must be
 measured frequently. The syndrome measurements are operations done by a
 classical controller, and dictate the error correction procedure, which is
 also classical. For large numbers of qubits, it will probably not be
-feasible to detect and correct errors on qubits in sequence. Rather, we would
+feasible to detect and correct errors on qubits one at at ime. Rather, we would
 prefer to detect and correct on all qubits in parallel. Therefore, at a
 macroscopic level, error correction is inherently parallel and involves
-classical control. For each qubit, physical or a logical qubit at any
+classical control. For each qubit, physical or a logical at any
 layer of concatenated encoding, we would also like the error detection
 and correction procedure to be fast and efficient, but this is beyond the
-scope of the current report, and we will say no more about it here.
+scope of the current report.

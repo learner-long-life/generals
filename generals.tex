@@ -1,13 +1,25 @@
 \documentclass[twocolumn,10pt]{article}
+\usepackage[pdftex]{graphicx}
 \usepackage{palatino}
 \usepackage{eprint}
 \usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{latexsym}
 \usepackage{microtype}
 \usepackage{algorithmic}
 \usepackage{ipe}
 
 \input{Qcircuit}
 
+\newcommand{\braket}[2]{\langle #1|#2 \rangle}
+\newcommand{\normtwo}{\frac{1}{\sqrt{2}}}
+\newcommand{\norm}[1]{\parallel #1 \parallel}
+\newcommand{\targfix}{\qw {\xy {<0em,0em> \ar @{ - } +<.39em,0em>
+\ar @{ - } -<.39em,0em> \ar @{ - } +<0em,.39em> \ar @{ - }
+-<0em,.39em>},<0em,0em>*{\rule{.01em}{.01em}}*+<.8em>\frm{o}
+\endxy}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \title{Low-depth quantum architectures}
 
 \author{Paul Pham}
